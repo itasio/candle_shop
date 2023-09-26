@@ -230,7 +230,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
 
         $(document).ready(function(){
  
-            //delete choice made
+            //add choice made
             $(document).on('click', 'button[data-role=add]', function(){
                 var id = $(this).data('id');
                 var name = $('#'+id).children('td[data-target=NAME]').text();

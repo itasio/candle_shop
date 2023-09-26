@@ -48,9 +48,6 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
             <!-- <h2>From this page you can access and modify users info</h2> -->
             <div class="data_table_form">
                 <div class= "table_form">  </div>
-
-                
-
             </div>
             <!-- form for editing the users info -->
             <div class="form-popup" id="editForm">
@@ -119,14 +116,15 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                 method  : "POST",
                 data    : {identity : param},
                 success : function(response){
+                        //now reloading the data from the database
+                        getUsers();
                         window.alert(response);
                 },
                 error   : function(xhr){
                     window.alert("An error occured: " + xhr.status + " " + xhr.statusText);
                 }
             });
-            //now reloading the data from the database
-            getUsers();
+            
 
         })
 
@@ -149,7 +147,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
 
         })
 
-        //submit the changes made in the products info
+        //submit the changes made in the users info
         $("form").submit(function (event) {
 
             event.preventDefault();
@@ -172,6 +170,8 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                 data    : {name : name, surname : surname, username : username,
                     email : email, role : role, confirmed : confirmed, uID : uID},
                 success : function(response){
+                        //now reloading the data from the database
+                        getUsers();
                         window.alert(response);
                 },
                 error   : function(xhr){
@@ -179,8 +179,6 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                 }
             });
 
-            //now reloading the data from the database
-            getUsers();
 
         });
 

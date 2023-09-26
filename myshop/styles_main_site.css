@@ -170,8 +170,8 @@ table,th,td {
 
   #editForm{
     display: none;
-    position: absolute;
-    width: 30%;
+    /* position: absolute;
+    width: 30%; */
   }
 
   #SearchFields input{
@@ -193,17 +193,25 @@ table,th,td {
     width: fit-content;
 }
 
+.form-popup{
+    position: absolute;
+    width: 30%;
+}
 
+.form-container{
+    width: 100%;
+    margin: auto;
+}
 
 select, button{
     padding: 5px;
     margin: 5px;
 }
 
-#edit_form{
+/* #edit_form{
     width: 100%;
     margin: auto;
-}
+} */
 
 #edit_form label{
     display: block;

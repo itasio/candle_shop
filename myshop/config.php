@@ -1,7 +1,7 @@
 <?php
-define('DB_SERVER', 'localhost');
-define('DB_USERNAME', 'root');
-define('DB_PASSWORD', '');
+define('DB_SERVER', 'db');
+define('DB_USERNAME', 'MYSQL_USER');
+define('DB_PASSWORD', 'MYSQL_PASSWORD');
 define('DB_NAME', 'shop1');
  
 /* Attempt to connect to MySQL database */
@@ -12,7 +12,3 @@ if($conn === false){
     die("ERROR: Could not connect. " . $conn->connect_error);
 }
 ?>
-
-
-
-

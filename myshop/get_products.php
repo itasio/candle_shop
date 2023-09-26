@@ -87,7 +87,7 @@ if($param == all){
     if($result){
         if($result->num_rows == 0){
             //nothing to display
-            echo  "<b> There aren't any products currently available in our site. <b>";
+            echo  "There aren't any products currently available in our site.";
         }else{
             echo "<table>";
             echo "<tr>";

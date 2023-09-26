@@ -1,6 +1,4 @@
 <?php
-session_start();
-
 // Check if the user is already logged in, if yes then redirect him to welcome page
 if(isset($_SESSION["loggedinToMyShop"]) && $_SESSION["loggedinToMyShop"] === true){
     header("location: welcome.php");
@@ -44,8 +42,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
                         }
                         elseif(password_verify($password, $hashed_password)){
                             // Password is correct, so start a new session
-                            session_start();
-                            
+                            session_start(); 
                             // Store data in session variables
                             $_SESSION["loggedinToMyShop"] = true;
                             $_SESSION["username"] = $username;
