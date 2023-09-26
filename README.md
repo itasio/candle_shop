@@ -5,6 +5,7 @@ This project was the assignment for the course of Cloud and Fog Services in spri
 
 Project had two phases.  
 **Phase 1:** Development of web application on localhost  
+**Phase 1:** Project from phase 1, now running on docker
 **Phase 2:** Docker migration, Microservices integration, GCP migration 
 
 Technologies used:  
