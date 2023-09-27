@@ -63,7 +63,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                         $msg = 'You have successfully added a new product.';
         
                     } else{
-                        $msg =  "An unexpected error occured. Please try again later.". "Error: " . "<br>" . $conn->error;
+                        $msg =  "An unexpected error occured. Please try again later." . "<br>" . "Important notice: Products with the same code can't belong in the same category.";
                     }
                 } catch (\Throwable $th) {
                     $msg =  "An unexpected error occured. You cannot insert the same product twice.";
@@ -131,36 +131,34 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
             </select>
             </form>
             <br>
-            <div id="data_table">
-                <div id= "table1">  <div> <b><?php echo $msg?> </b></div> </div>
-
-                <!-- form for editing the products info -->
-                <div class="form-popup" id="editForm">
-                    <form action="edit_product.php" class="form-container">
-                        <h1>Edit data</h1>
-
-                        <label for="product_name"><b>Name</b></label>
-                        <input id="product_name" type="text" name="product_name" required class = "inputFields">
-
-                        <label for="product_code"><b>Product code</b></label>
-                        <input id="product_code" type="text" name="product_code" required class = "inputFields">
-
-                        <label for="product_price"><b>Product price</b></label>
-                        <input id="product_price" type="number" name="product_price" required class = "inputFields" min="0.01" max="10000" step="0.01">
-
-                        <label for="product_category"><b>Product category</b></label>
-                        <input id="product_category" type="text" name="product_category" required class = "inputFields">
-
-                        <input id="pID" type ="hidden" class = "inputFields">
-
-                        <button type="submit" class="btn" data-role="submit">Submit</button>
-                        <button type="button" class="btn cancel" data-role="close">Cancel</button>
-                    </form>
-                </div>
-
+            <div class="data_table_form">
+                <div class="table_form">  <div> <b><?php echo $msg?> </b></div> </div>
             </div>
- 
+                <!-- form for editing the products info -->
+            <div class="form-popup" id="edit_form" style="display: none;">
+                <form action="edit_product.php" class="form-container">
+                    <h1>Edit data</h1>
 
+                    <label for="product_name"><b>Name</b></label>
+                    <input id="product_name" type="text" name="product_name" required class = "inputFields"> <br>
+
+                    <label for="product_code"><b>Product code</b></label>
+                    <input id="product_code" type="text" name="product_code" required class = "inputFields"> <br>
+
+                    <label for="product_price"><b>Product price</b></label>
+                    <input id="product_price" type="number" name="product_price" required class = "inputFields" min="0.01" max="10000" step="0.01"> <br>
+
+                    <label for="product_category"><b>Product category</b></label>
+                    <input id="product_category" type="text" name="product_category" required class = "inputFields"> <br>
+
+                    <input id="pID" type ="hidden" class = "inputFields">
+
+                    <button type="submit" class="btn" data-role="submit">Submit</button>
+                    <button type="button" class="btn cancel" data-role="close">Cancel</button>
+                </form>
+            </div>
+
+            
             
         </div>
             
@@ -169,19 +167,28 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
 
 
     <script>
-        var frm = document.getElementById("table1");
+        var frm = document.getElementsByClassName("table_form")[0];
+        var cnt = document.getElementsByClassName("contentTable")[0];
         function showOptions(str) {
             var xhttp;    
             if (str == "") {
-                document.getElementById("table1").innerHTML = "";
+                document.getElementsByClassName("table_form")[0].innerHTML = "";
+                document.getElementById("edit_form").style.display = "none";
+                let ins_form = document.getElementById('insert_form');
+                if(ins_form != null){
+                    ins_form.remove();
+                }
                 return;
             }else if(str == "Insert"){
-                document.getElementById("table1").innerHTML = "";
+                document.getElementsByClassName("table_form")[0].innerHTML = "";
+                document.getElementById("edit_form").style.display = "none";
                 //show the Insert form
                 // Create a break line element
                 var br = document.createElement("br");
                 var form = document.createElement("form");
                 form.setAttribute("method", "post");
+                form.setAttribute("style", "position:relative");
+                form.setAttribute("id", "insert_form");
                 //data will be sent to the page itself
                 form.setAttribute("action", "<?php echo htmlspecialchars($_SERVER["PHP_SELF"]); ?>");
                 
@@ -268,7 +275,7 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                 form.appendChild(sub);
 
                 //append form to document
-                frm.append(form);
+                cnt.append(form);
                 return;
 
 
@@ -277,6 +284,10 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
             else if(str == "Show"){
                 //show only this seller's products with update or delete available which are not withdrawed from the site
                 frm.innerHTML = "";
+                let ins_form = document.getElementById('insert_form');
+                if(ins_form != null){
+                    ins_form.remove();
+                }
                 xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
@@ -292,6 +303,11 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                 //show only this seller's withdrawed products with option for making them available again
                 var xhttp;
                 frm.innerHTML = "";
+                let ins_form = document.getElementById('insert_form');
+                if(ins_form != null){
+                    ins_form.remove();
+                }
+                document.getElementById("edit_form").style.display = "none";
                 xhttp = new XMLHttpRequest();
                 xhttp.onreadystatechange = function() {
                     if (this.readyState == 4 && this.status == 200) {
@@ -317,21 +333,22 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                     method  : "POST",
                     data    : {identity : param},
                     success : function(response){
+                              //now reloading the data from the database
+                              loadActiveProducts(frm);
                               window.alert(response);
                     },
                     error   : function(xhr){
                         window.alert("An error occured: " + xhr.status + " " + xhr.statusText);
                     }
                 });
-                //now reloading the data from the database
-                loadActiveProducts(frm);
+                
 
             })
 
             //edit choice made
             //open popup
             $(document).on('click', 'button[data-role=edit]', function(){
-                document.getElementById("editForm").style.display = "block";
+                document.getElementById("edit_form").style.display = "block";
                 //get the values of the table data
                 var id = $(this).data('id');
                 var name = $('#'+id).children('td[data-target=NAME]').text();
@@ -358,12 +375,14 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                 var pr = $('#product_price').val();
                 var cat =  $('#product_category').val();
                 var pID =  $('#pID').val();
-                document.getElementById("editForm").style.display = "none";
+                document.getElementById("edit_form").style.display = "none";
                 $.ajax({
                     url     : "edit_product.php",
                     method  : "POST",
                     data    : {name : name, pcode : pcode, pr : pr, cat : cat, pID : pID},
                     success : function(response){
+                              //now reloading the data from the database
+                              loadActiveProducts(frm);
                               window.alert(response);
                     },
                     error   : function(xhr){
@@ -371,14 +390,13 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                     }
                 });
 
-                //now reloading the data from the database
-                loadActiveProducts(frm);
+                
             
             });
 
             //close the popup
             $(document).on('click', 'button[data-role=close]', function(){
-                document.getElementById("editForm").style.display = "none";
+                document.getElementById("edit_form").style.display = "none";
             })
 
         })
