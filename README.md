@@ -1,7 +1,7 @@
 # candle_shop
 Web application development for database management
 
-# main branch currenty up to date with phase 1.5
+## main branch currenty up to date with phase 1.5
 
 This project was the assignment for the course of Cloud and Fog Services in spring semester 2022-2023 at Technical University of Crete.
 
