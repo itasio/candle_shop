@@ -1,14 +1,260 @@
-ΕΚΚΡΕΜΟΤΗΤΕΣ ΓΙΑ ΕΡΓΑΣΙΑ ΝΕΦΟΣ
+Σημειώσεις
+Base 64 laptop
+NDA3NWE2YzUtNTUxYi00NTllLWJiMTctZDZjMGFjZDkwNWM0OmU1OTU2MGFmLTE4NTgtNDBhZi04ZDVlLTcxNDAxNDZjODkyZQ==
+$appID = "4075a6c5-551b-459e-bb17-d6c0acd905c4";
+$roleUserID = "6a80b3ad-b458-48f2-a223-fd8ae85c098d";
+$roleProductsellerID = "fd2c47a6-33ed-47c7-a549-892c1049d006";
+$roleAdminID = "bef9ae28-26bf-4380-906a-b5dc1bccb43d";
 
-1. Να βαλω timeout  για τα session
-2. Na γίνουν ολα τα queries secure
+Base 64 desktop index, signup, edit user, 
+NmQ0Mzc5YWQtNzI1YS00MGI5LWI5MWYtZjJkNWRkZjQ4YWNlOjFhZjIwZDg3LTI1ODAtNDNhNy05MTA0LTcwZjIyMGRmNDYyYg==
+$appID = "6d4379ad-725a-40b9-b91f-f2d5ddf48ace";
+$roleUserID = "59c1ff0a-6292-4dc1-966d-2d6f3fb7e6b7";
+$roleProductsellerID = "adb64b81-d753-4a38-a712-f72c07e4ff31";
+$roleAdminID = "22035ca4-3aa1-41b0-bc3d-d1baa9087bda";
 
 
-ΣΗΜΕΙΩΣΕΙΣ Να γίνει check για το αν ισχύουν τα παρακάτω
-1. Τα προιόντα δεν γινεται να έχουν ίδιο κωδικό και να ανήκουν στην ίδια κατηγορία
-2. Ο κάθε χρήστης μπορεί να κάνει αναζήτηση προιόντων. Εμφανίζονται προιόντα διαθέσιμα και μη. Θα γράφει STATUS
-	AVAILABLE / UNAVAILABLE  
-	Μόνο τα διαθέσιμα θα μπορεί να τα βάλει στο καλάθι
-3. Αναζητα προιοντα βάσει ημερομηνία απόσυρσης τους και εμφανίζονται όσα είναι διαθέσιμα (δεν έχουν αποσυρθεί) και
-   όσα έχουν αποσυρθεί μετά από την επιλεγμένη ημερομηνία.
-4. Πλαίσιο εισαγωγής search στο μενού πλοήγησης είναι μη λειτουργικό. Δεν ήταν στα ζητούμενα της άσκησης και μπορεί να υλοποιηθεί σε μεταγενέστερο χρόνο.
+Χρήσιμοι συνδεσμοι
+1.https://fiware-idm.readthedocs.io/en/latest/getting_started/index.html
+2.https://keyrock.docs.apiary.io/#reference/keyrock-api/applications
+3.https://documenter.getpostman.com/view/513743/RWMLLRui#bf4cf4d5-f9ac-462b-8008-dbe25fbd1ada
+4.https://fiware-idm.readthedocs.io/en/latest/oauth/oauth_documentation/index.html#access-token-response
+
+
+Έκκρεμότητες
+
+    SOS ΕΩΣ ΠΕΜΠΤΗ 8/12/22
+1.  Να διορθώσω τη σελίδα του seller
+    -Να δείχνει στο πλάι και όχι από κάτω τα πεδία για edit
+    -Να σβήνονται τα πεδία του edit όταν επιλέξει κάποια άλλη επιλογή πχ. show deleted products.
+2.  Τα προιόντα που βάζει στο καλάθι θα δημιουργούν καλάθι στη βάση;
+    -Τώρα απλά αποθηκεύονται σαν session variables και όταν κάνει log out αυτά σβήνονται
+    
+
+ΕΡΩΤΗΣΕΙΣ 
+1.  Γιατί αν έχω κενά μετά το τέλος του config file βγάζει σφάλμα στο docker και στο xampp δεν βγάζει ?
+        πχ. Warning: Cannot modify header information - headers already sent by (output started at /some/file.php:12) in /some/file.php on line 23
+
+2.  Γιατί έχοντας δύο session_start() στο ίδιο script βγάζει σφάλμα στο docker και όχι στο xampp ?
+        Notice: A session had already been started - ignoring session_start()
+
+
+3.  Το curl call "Create token with Password" επιστρέφει ένα X-Subject-token που χρειάζεται σε κάποια από τα επόμενα. Πώς θα μπορώ να αποκτήσω πρόσβαση σε αυτό και στο X-Auth-token μέσα από τον κώδικα;
+        CORS header 'Access-Control-Allow-Origin' missing
+
+4.  ΔΕΝ ΔΟΥΛΕΥΕΙ creating an OAuth Token (Από Getting started) 
+    curl -X POST -H "Authorization: Basic $(echo -n 6d4379ad-725a-40b9-b91f-f2d5ddf48ace:1af20d87-2580-43a7-9104-70f220df462b | base64 -w 0)" --header "Content-Type: application/x-www-form-urlencoded" -d "grant_type=password&username=admin@test.com&password=1234" http://localhost:3000/oauth2/token
+        ->{"error":"invalid_client"}
+
+5.  Στο collection fiware δημιουργώ το auth token(grant_type: client credentials είτε password credentials), αλλά όταν πάω να κάνω κάποιο άλλο αίτημα 
+    πχ. List users επιστρέφει 
+        "error": {
+            "message": "Token not found",
+            "code": 404,
+            "title": "Not Found"
+        }
+    πχ. Get token info επιστρέφει
+        "error": {
+            "message": "Invalid email or password",
+            "code": 401,
+            "title": "Unauthorized"
+    }
+6.  Πώς να κάνω νέο access_token με grant_type: Authorization code ??
+    Τι να βάλω στο Auth URL ?
+
+7.  Get user information and roles ΔΟΥΛΕΥΕΙ. Γιατί ??
+    μήπως φταίει η διεύθυνση;   εδω βάζω http://localhost:3000/user?access_token={{X-Auth-token}}
+    και στα άλλα μπαίνει το v1 πχ http://localhost:3000/v1/users
+
+
+!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+
+!   Δουλεψαν τα Create a user, Create a user, Read info about a user, Update a user χρησιμοποιώντας σαν X-Auth-token
+    το X-Subject-token που επιστρέφει το Create token with Password
+
+!   Επισης δουλεψε το Get token info με X-Auth-token το X-Subject-token που επιστρέφει το Create token with Password
+    και σαν X-Subject-token το 18d56a25-d31c-40b1-9c99-5daac272c4fc που δεν ξερω τι είναι, επισης δουλευει και οταν X-Auth-token και X-Subject-token έχουν ίδια τιμή
+
+!   Το Get user information and roles με X-Auth-token το X-Subject-token δεν δουλεψε
+
+!   Όταν κάποιος κάνει sign up απ' το gui του keyrock αρχικά είναι disabled και δεν έχει πρόσβαση. Αυτόματα. 
+    Πρέπει κάποιος admin να τον κάνει enable για να μπορέσει να μπει.
+
+    list users
+
+    {
+    "users": [
+        {
+        "id": "fae943b2-7ada-42e8-8427-2c08279b4cae",
+        "image": "default",
+        "gravatar": false,
+        "enabled": true,
+        "admin": false,
+        "starters_tour_ended": false,
+        "eidas_id": null,
+        "username": "seller5",
+        "email": "seller5@test.com",
+        "salt": "1aeadb8ffd7d9251",
+        "description": "some name",
+        "date_password": "2022-12-17T10:07:24.284Z"
+    }
+        {
+            "scope": [],
+            "id": "10181b49-ee46-4c29-99e7-430a31b982b4",
+            "username": "a",
+            "email": "a@test.com",
+            "enabled": false,
+            "gravatar": false,
+            "date_password": "2022-12-15T22:30:46.000Z",
+            "description": null,
+            "website": null
+        },
+        {
+            "scope": [],
+            "id": "21cfe17c-246c-458a-bb5f-8a1d5a41545d",
+            "username": "b",
+            "email": "b@test.com",
+            "enabled": false,
+            "gravatar": false,
+            "date_password": "2022-12-17T07:20:38.000Z",
+            "description": null,
+            "website": null
+        },
+        {
+            "scope": [],
+            "id": "29f57473-1fd2-416d-9eae-a7a7db85877e",
+            "username": "seller1",
+            "email": "seller1@seller.com",
+            "enabled": true,
+            "gravatar": false,
+            "date_password": "2022-12-05T21:18:24.000Z",
+            "description": "John Doe",
+            "website": ""
+        },
+        {
+            "scope": [],
+            "id": "63dea709-06aa-4343-9c68-e5f2a1ac563a",
+            "username": "new_alice",
+            "email": "alice@test.com",
+            "enabled": true,
+            "gravatar": false,
+            "date_password": "2022-12-13T22:28:40.000Z",
+            "description": "Lina Mina",
+            "website": ""
+        },
+        {
+            "scope": [],
+            "id": "admin",
+            "username": "admin",
+            "email": "admin@test.com",
+            "enabled": true,
+            "gravatar": false,
+            "date_password": "2022-12-04T17:06:35.000Z",
+            "description": "Our father",
+            "website": ""
+        },
+        {
+            "scope": [],
+            "id": "be9b8b35-6939-4524-8b1a-e27ff0a0036d",
+            "username": "seller2",
+            "email": "seller2@test.com",
+            "enabled": true,
+            "gravatar": false,
+            "date_password": "2022-12-15T22:12:26.000Z",
+            "description": null,
+            "website": null
+        },
+        {
+            "scope": [],
+            "id": "eda087a6-744a-46d2-847d-7bb261a4312d",
+            "username": "giannis",
+            "email": "giannis@test.com",
+            "enabled": true,
+            "gravatar": false,
+            "date_password": "2022-12-05T21:10:45.000Z",
+            "description": "Giannis Tasio",
+            "website": ""
+        },
+        {
+            "scope": [],
+            "id": "efae7aea-c883-4948-9783-a5bd40956967",
+            "username": "user1",
+            "email": "user1@test.com",
+            "enabled": true,
+            "gravatar": false,
+            "date_password": "2022-12-15T13:51:01.000Z",
+            "description": "Jack Black",
+            "website": ""
+        }
+    ]
+}
+
+to generate x Subject token 
+
+ curl_setopt($ch, CURLOPT_POSTFIELDS, "{
+          \"name\": \"".$email."\",
+          \"password\": \"".$password."\"
+        }");
+
+
+/////////////////// Gia na kanei debug ena curl request//////////////////////////
+ curl_setopt($ch, CURLOPT_VERBOSE, true);
+
+            
+
+$streamVerboseHandle = fopen('php://temp', 'w+');
+curl_setopt($ch, CURLOPT_STDERR, $streamVerboseHandle);
+
+
+            curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+                "Content-Type: application/json",
+                "X-Auth-token: ".$xtoken.""
+            ));
+            $response = curl_exec($ch);
+
+if ($response === FALSE) {
+    printf("cUrl error (#%d): %s<br>\n",
+            curl_errno($ch),
+            htmlspecialchars(curl_error($ch)))
+            ;
+}
+
+rewind($streamVerboseHandle);
+$verboseLog = stream_get_contents($streamVerboseHandle);
+
+echo "cUrl verbose information:\n", 
+"<pre>", htmlspecialchars($verboseLog), "</pre>\n";           
+
+            $fp = fopen("example_homepage.txt", "w"); 
+            if(curl_error($ch)) {  
+                fwrite($fp, curl_error($ch));  
+            }
+
+            curl_close($ch);
+
+List roles of application
+
+{
+    "roles": [
+        {
+            "id": "purchaser",
+            "name": "Purchaser"
+        },
+        {
+            "id": "provider",
+            "name": "Provider"
+        }
+}
+
+$response = curl_exec($curl);
+$result = json_decode($response);
+var_dump( $result);
+
+object(stdClass)#7 (1) { ["roles"]=> array(5) { [0]=> object(stdClass)#2 (2) { ["id"]=> string(9) "purchaser" ["name"]=> string(9) "Purchaser" } [1]=> object(stdClass)#3 (2) { ["id"]=> string(8) "provider" ["name"]=> string(8) "Provider" } [2]=> object(stdClass)#4 (2) { ["id"]=> string(36) "fd2c47a6-33ed-47c7-a549-892c1049d006" ["name"]=> string(13) "PRODUCTSELLER" }
+ [3]=> object(stdClass)#5 (2) { ["id"]=> string(36) "bef9ae28-26bf-4380-906a-b5dc1bccb43d" ["name"]=> string(5) "ADMIN" } [4]=> object(stdClass)#6 (2) { ["id"]=> string(36) "6a80b3ad-b458-48f2-a223-fd8ae85c098d" ["name"]=> string(4) "USER" } } } 
+
+ $result = json_decode($response, true);
+ var_dump( $result);
+
+ array(1) { ["roles"]=> array(5) { [0]=> array(2) { ["id"]=> string(9) "purchaser" ["name"]=> string(9) "Purchaser" } [1]=> array(2) { ["id"]=> string(8) "provider" ["name"]=> string(8) "Provider" } [2]=> array(2) { ["id"]=> string(36) "fd2c47a6-33ed-47c7-a549-892c1049d006" ["name"]=> string(13) "PRODUCTSELLER" }
+  [3]=> array(2) { ["id"]=> string(36) "bef9ae28-26bf-4380-906a-b5dc1bccb43d" ["name"]=> string(5) "ADMIN" } [4]=> array(2) { ["id"]=> string(36) "6a80b3ad-b458-48f2-a223-fd8ae85c098d" ["name"]=> string(4) "USER" } } } 
