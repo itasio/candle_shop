@@ -240,7 +240,8 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                 var price = $('#'+id).children('td[data-target=PRICE]').text();
                 var dt = new Date();
                 var dt_str = dt.toDateString();
-                var product = { "name": name,
+                var product = { "prod_id" : id,
+                                "name": name,
                                 "code": code,
                                 "category": category,
                                 "sellername": sellername,

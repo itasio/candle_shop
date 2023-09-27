@@ -75,8 +75,8 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                     <label for="admin"> <b>Administrator</b> </label>
                     <input type="radio" data-info="role" name="role" id="admin" value="ADMIN" required> <br>
 
-                    <label for="confirmed"> <b>Confirmed</b> </label>
-                    <input type="checkbox" name="confirmed" id="confirmed"> <br>
+                    <!-- <label for="confirmed"> <b>Confirmed</b> </label>
+                    <input type="checkbox" name="confirmed" id="confirmed"> <br> -->
 
 
                     <input id="uID" type ="hidden" class = "inputFields">
@@ -157,18 +157,18 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
             var username = $('#user_name').val();
             var email =  $('#email').val();
             var role =  $("input[name='role']:checked").val();
-            if ($('#confirmed').is(":checked")){
-                var confirmed = "1";
-            }else{
-                var confirmed = "0";
-            }            
+            // if ($('#confirmed').is(":checked")){
+            //     var confirmed = "1";
+            // }else{
+            //     var confirmed = "0";
+            // }            
             var uID =  $('#uID').val();
             document.getElementById("editForm").style.display = "none";
             $.ajax({
                 url     : "edit_user.php",
                 method  : "POST",
                 data    : {name : name, surname : surname, username : username,
-                    email : email, role : role, confirmed : confirmed, uID : uID},
+                    email : email, role : role, uID : uID},
                 success : function(response){
                         //now reloading the data from the database
                         getUsers();
