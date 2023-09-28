@@ -2,7 +2,7 @@
 
 $msg = "";
 if($_SERVER["REQUEST_METHOD"] == "POST") {
-    require_once "headers_to_array.php";
+
     // if(isset($_POST["name"]) && isset($_POST["surname"]) && isset($_POST["username"]) && isset($_POST["password"]) && isset($_POST["role"]) && isset($_POST["email"])){
     if(isset($_POST["username"]) && isset($_POST["password"]) && isset($_POST["role"]) && isset($_POST["email"])){
         $name = $_POST["name"];
@@ -59,8 +59,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             $body = substr($response, $header_size);
 
             curl_close($ch);
-            $hc = new HeaderConverter();
-            $data = $hc->headersToArray($header);
+
+            $data = headersToArray($header);
             $xtoken = $data['X-Subject-Token'];
 
             /********************** CREATE USER *********************/
@@ -125,10 +125,10 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             }
 
             /******************** ASSIGN A ROLE TO A USER **********************/
-            $appID = "4075a6c5-551b-459e-bb17-d6c0acd905c4";
-            $roleUserID = "6a80b3ad-b458-48f2-a223-fd8ae85c098d";
-            $roleProductsellerID = "fd2c47a6-33ed-47c7-a549-892c1049d006";
-            $roleAdminID = "bef9ae28-26bf-4380-906a-b5dc1bccb43d";
+            $appID = "6d4379ad-725a-40b9-b91f-f2d5ddf48ace";
+            $roleUserID = "59c1ff0a-6292-4dc1-966d-2d6f3fb7e6b7";
+            $roleProductsellerID = "adb64b81-d753-4a38-a712-f72c07e4ff31";
+            $roleAdminID = "22035ca4-3aa1-41b0-bc3d-d1baa9087bda";
             
             if ($role == "USER") {
                 $rolechoiceID =  $roleUserID;
@@ -158,6 +158,32 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 
 } 
+
+/**
+ * This function converts a string of headers and returns an
+ *  associative array with the header names as keys and their values as values
+ * @link https://blog.devgenius.io/how-to-get-the-response-headers-with-curl-in-php-2173b10d4fc5
+ */
+function headersToArray($str)
+{
+    $headers = array();
+    $headersTmpArray = explode( "\r\n" , $str );
+    for ( $i = 0 ; $i < count( $headersTmpArray ) ; ++$i )
+    {
+        // we dont care about the two \r\n lines at the end of the headers
+        if ( strlen( $headersTmpArray[$i] ) > 0 )
+        {
+            // the headers start with HTTP status codes, which do not contain a colon so we can filter them out too
+            if ( strpos( $headersTmpArray[$i] , ":" ) )
+            {
+                $headerName = substr( $headersTmpArray[$i] , 0 , strpos( $headersTmpArray[$i] , ":" ) );
+                $headerValue = substr( $headersTmpArray[$i] , strpos( $headersTmpArray[$i] , ":" )+1 );
+                $headers[$headerName] = $headerValue;
+            }
+        }
+    }
+    return $headers;
+}
 
 function validInput($name, $surname, $email, $username, $password){
     if(empty(trim($name)) || empty(trim($surname)) ||empty(trim($email)) || empty(trim($username)) || empty(trim($password)))

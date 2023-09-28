@@ -10,14 +10,14 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
     header("location: access_denied.php");
     exit;
 }
-require_once "headers_to_array.php";
+
 //i want to get from keyrock for each user authorized in our app some info
 //specifically ID, NAME, SURNAME, USERNAME, EMAIL, ROLE
 //user cannot be disabled through the api so only the action delete can be made
 //which is done through the delete_user.php file
 
-//i need List roles -> for all roles in our application: role_id, role_name   => create assoc array roles[role_id] = role_name
-//i need Authorized users in an application -> user_id, role_id               => create assoc array auth_user[user_id] = role_id
+//i need List roles -> for all roles in our application: role_id, role_name   => create assoc array auth_user[user_id] = role_id
+//i need Authorized users in an application -> user_id, role_id               => create assoc array roles[role_id] = role_name
 //i need List users request (X-subj) -> user id, username, email, name, surname 
 
 
@@ -43,7 +43,6 @@ $response = curl_exec($curl);
 if($response){
   curl_close($curl);
   $result = json_decode($response);
-//echo $response;
   $num_of_roles = count($result->roles); 
   //create an assoc array
   //roles[role_id] = role_name;
@@ -68,45 +67,11 @@ if($response){
   curl_close($ch);
   if($response){
     $result = json_decode($response);
-//echo $response;
     $num_of_auth_users = count($result->role_user_assignments);
     for ($i=0; $i < $num_of_auth_users; $i++) { 
       $auth_user[$result->role_user_assignments[$i]->user_id] = $result->role_user_assignments[$i]->role_id;
     }
 
-
-    //i need admin's credentials to list and/or modify users
-    /***************** ACQUIRE X-Subj-Token *****************/
-
-    $ch = curl_init();
-
-    curl_setopt($ch, CURLOPT_URL, "http://keyrock:3000/v1/auth/tokens");
-    curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
-    curl_setopt($ch, CURLOPT_HEADER, 1);
-    curl_setopt($ch, CURLOPT_POST, TRUE);
-
-    curl_setopt($ch, CURLOPT_POSTFIELDS, "{
-        \"name\": \"admin@test.com\",
-        \"password\": \"1234\"
-    }");
-
-    curl_setopt($ch, CURLOPT_HTTPHEADER, array(
-    "Content-Type: application/json"
-    ));
-
-    $response = curl_exec($ch);  
-    
-    $header_size = curl_getinfo($ch, CURLINFO_HEADER_SIZE);
-    $header = substr($response, 0, $header_size);
-    $body = substr($response, $header_size);
-
-    curl_close($ch);
-
-    $hc = new HeaderConverter();
-    $data = $hc->headersToArray($header);
-    $xtoken = $data['X-Subject-Token'];
-
-    
     /****************************** List users****************************/
 
     $curl = curl_init();
@@ -121,7 +86,7 @@ if($response){
       CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
       CURLOPT_CUSTOMREQUEST => 'GET',
       CURLOPT_HTTPHEADER => array(
-        "X-Auth-Token: ".$xtoken.""
+        "X-Auth-Token: ".$_SESSION["x_subj"].""
       ),
     ));
 
@@ -129,7 +94,7 @@ if($response){
     curl_close($curl);
     if($response){
       $result = json_decode($response, true);
-//echo $response;
+
       echo "<table>";
       echo "<tr>";
           echo "<th>name</th>";

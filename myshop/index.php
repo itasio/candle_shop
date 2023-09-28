@@ -4,7 +4,7 @@ if(isset($_SESSION["loggedinToMyShop"]) && $_SESSION["loggedinToMyShop"] === tru
     header("location: welcome.php");
     exit;
 }
-require_once "headers_to_array.php";
+ 
 // Define variables and initialize with empty values
 $errorMessage = '';
 // Processing form data when form is submitted
@@ -49,8 +49,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
         // if($res === null){
         //   $errorMessage = 'Invalid username or passworddddddd.';
         // }else{
-        $hc = new HeaderConverter();
-        $data = $hc->headersToArray($header);
+        $data = headersToArray($header);
 
         //var_dump($data);
         if(array_key_exists('X-Subject-Token', $data)){
@@ -73,9 +72,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           CURLOPT_HTTPHEADER => array(
             'Content-Type: application/x-www-form-urlencoded',            
             // Desk
-            //'Authorization: Basic NmQ0Mzc5YWQtNzI1YS00MGI5LWI5MWYtZjJkNWRkZjQ4YWNlOjFhZjIwZDg3LTI1ODAtNDNhNy05MTA0LTcwZjIyMGRmNDYyYg==' // this huge string is the base-64(client_id:client_secret) string
+            'Authorization: Basic NmQ0Mzc5YWQtNzI1YS00MGI5LWI5MWYtZjJkNWRkZjQ4YWNlOjFhZjIwZDg3LTI1ODAtNDNhNy05MTA0LTcwZjIyMGRmNDYyYg==' // this huge string is the base-64(client_id:client_secret) string
             //Lap
-            'Authorization: Basic NDA3NWE2YzUtNTUxYi00NTllLWJiMTctZDZjMGFjZDkwNWM0OmU1OTU2MGFmLTE4NTgtNDBhZi04ZDVlLTcxNDAxNDZjODkyZQ=='
+            //'Authorization: Basic NDA3NWE2YzUtNTUxYi00NTllLWJiMTctZDZjMGFjZDkwNWM0OmU1OTU2MGFmLTE4NTgtNDBhZi04ZDVlLTcxNDAxNDZjODkyZQ=='
           ),
         ));
 
@@ -219,7 +218,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           // }
 
           session_start();
-          $_SESSION["app_id"] = '4075a6c5-551b-459e-bb17-d6c0acd905c4';
+          $_SESSION["app_id"] = '6d4379ad-725a-40b9-b91f-f2d5ddf48ace';
           $_SESSION["token"] = $x_oath;
           $_SESSION["x_subj"] = $xtoken;
           $_SESSION["id"] = $userid;
@@ -247,6 +246,32 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
     }
 
 } 
+/**
+ * This function converts a string of headers and returns an
+ *  associative array with the header names as keys and their values as values
+ * @link https://blog.devgenius.io/how-to-get-the-response-headers-with-curl-in-php-2173b10d4fc5
+ */
+function headersToArray($str)
+{
+    $headers = array();
+    $headersTmpArray = explode( "\r\n" , $str );
+    for ( $i = 0 ; $i < count( $headersTmpArray ) ; ++$i )
+    {
+        // we dont care about the two \r\n lines at the end of the headers
+        if ( strlen( $headersTmpArray[$i] ) > 0 )
+        {
+            // the headers start with HTTP status codes, which do not contain a colon so we can filter them out too
+            if ( strpos( $headersTmpArray[$i] , ":" ) )
+            {
+                $headerName = substr( $headersTmpArray[$i] , 0 , strpos( $headersTmpArray[$i] , ":" ) );
+                $headerValue = substr( $headersTmpArray[$i] , strpos( $headersTmpArray[$i] , ":" )+1 );
+                $headers[$headerName] = $headerValue;
+            }
+        }
+    }
+    return $headers;
+}
+
 function validInput($email, $password){
     if(empty(trim($email)) || empty(trim($password)))
         return false;
