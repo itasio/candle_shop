@@ -8,7 +8,7 @@ services:
         depends_on:
             - mysql-db
         volumes:
-            - ./mynewshop:/var/www/html/
+            - ./myshop:/var/www/html/
         ports:
             - 8000:80
     keyrock:
@@ -66,7 +66,7 @@ services:
     
     mongo:
         image: mongo
-        restart: always
+        #restart: always
         ports:
             - 27017:27017
         networks:
@@ -76,13 +76,11 @@ services:
             MONGO_INITDB_ROOT_USERNAME: root
             MONGO_INITDB_ROOT_PASSWORD: 1234
         volumes:
-            - ./database/mongodb/db:/data/db
-            - ./database/mongodb/dev.archive:/Databases/dev.archive
-            - ./database/mongodb/production:/Databases/production
+            - mongodata:/data/db
 
     mongo-express:
         image: mongo-express
-        restart: unless-stopped
+        #restart: unless-stopped
         ports:  
             - 8081:8081
         depends_on:
@@ -104,3 +102,4 @@ networks:
 volumes:
     mysql-db: ~
     mongo: ~
+    mongodata:
