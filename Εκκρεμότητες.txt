@@ -7,12 +7,13 @@ $roleProductsellerID = "fd2c47a6-33ed-47c7-a549-892c1049d006";
 $roleAdminID = "bef9ae28-26bf-4380-906a-b5dc1bccb43d";
 
 ----νεα εφαρμογη για laptop----
+
 Base 64 laptop
 YTZmZDBlMzctZjY3My00YTE2LWI0YjMtMjEzZDZkNzM0YjkxOjJlNzg4YjZmLTQzM2QtNGU1NC04ZGQyLTAwMmY4Y2ZiZmRkYQ==
-$appID = "4075a6c5-551b-459e-bb17-d6c0acd905c4";
-$roleUserID = "6a80b3ad-b458-48f2-a223-fd8ae85c098d";
-$roleProductsellerID = "fd2c47a6-33ed-47c7-a549-892c1049d006";
-$roleAdminID = "bef9ae28-26bf-4380-906a-b5dc1bccb43d";
+$appID = "a6fd0e37-f673-4a16-b4b3-213d6d734b91";
+$roleUserID = "4e95b5a8-13d2-40fc-8de4-c53a403e7a29";
+$roleProductsellerID = "ba6ed8ca-b388-4b5f-a8aa-3693b4b8ed2f";
+$roleAdminID = "6eb730a5-28dd-4cf8-a65d-f578727e9ecc";
 
 
 Base 64 desktop index, signup, edit user, 
