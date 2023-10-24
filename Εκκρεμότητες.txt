@@ -268,3 +268,9 @@ object(stdClass)#7 (1) { ["roles"]=> array(5) { [0]=> object(stdClass)#2 (2) { [
 
  array(1) { ["roles"]=> array(5) { [0]=> array(2) { ["id"]=> string(9) "purchaser" ["name"]=> string(9) "Purchaser" } [1]=> array(2) { ["id"]=> string(8) "provider" ["name"]=> string(8) "Provider" } [2]=> array(2) { ["id"]=> string(36) "fd2c47a6-33ed-47c7-a549-892c1049d006" ["name"]=> string(13) "PRODUCTSELLER" }
   [3]=> array(2) { ["id"]=> string(36) "bef9ae28-26bf-4380-906a-b5dc1bccb43d" ["name"]=> string(5) "ADMIN" } [4]=> array(2) { ["id"]=> string(36) "6a80b3ad-b458-48f2-a223-fd8ae85c098d" ["name"]=> string(4) "USER" } } } 
+
+Για το composer έτρεξα την εντολή composer require mongodb/mongodb στο terminal του php-apache 
+και τοτε δημιουργήθηκαν τα ζητουμενα αρχεια και directories. Με την εντολή στο dockerfile, αν και
+τα logs εδειχναν να εγκαθιστανται ολα μια χαρα, δεν δημιουργουνταν τα αρχεια.
+
+docker exec -it f717...c8ff /bin/sh
