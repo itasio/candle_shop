@@ -18,14 +18,33 @@ class Product{
         $this->client = $client;
     }
 
+    /**
+     * Fuction checks for product documents in the database and returns an array with all the product documents or 
+     * an empty array if there aren't any.
+     * 
+     * @return array
+     */
     public function read_all(){
         try {
             $collection = $this->client->$this->db->$this->collection_name;
             $cursor = $collection->find();
+            $prod_arr = array();
 
             foreach ($cursor as $document) {
-                echo $document['name'], "\n";
+                $prod_item = array(
+                    'name' => $document['NAME'],
+                    'productcode' => $document['PRODUCTCODE'],
+                    'price' => $document['PRICE'],
+                    'dateofwithdrawal' => $document['DATEOFWITHDRAWAL'],
+                    'sellername' => $document['SELLERNAME'],
+                    'category' => $document['CATEGORY']
+                );
+
+                // Push to post array
+                array_push($prod_arr, $prod_item);
             }
+
+            return $prod_arr;
         } catch (\Exception $e) {
             echo $e->getMessage();
         }
