@@ -4,8 +4,8 @@ use MongoDB\Exception\Exception;
 
 class Product{
     private $client;
-    private $db = "shop1";
-    private $collection_name = "products";
+    // private $db = "shop1";
+    // private $collection_name = "products";
     private $name;
     private $productcode;
     private $price;
@@ -26,7 +26,7 @@ class Product{
      */
     public function read_all(){
         try {
-            $collection = $this->client->$this->db->$this->collection_name;
+            $collection = $this->client->shop1->products;
             $cursor = $collection->find();
             $prod_arr = array();
 

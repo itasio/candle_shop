@@ -11,7 +11,7 @@ class Database{
         try {
             
             require_once dirname(__DIR__) . '/vendor/autoload.php';
-            $dotenv = Dotenv\Dotenv::createImmutable(__DIR__ . '/config');  
+            $dotenv = Dotenv\Dotenv::createImmutable(__DIR__);  
             $dotenv->load();        //load credentials from .env file
             $mdbserver = "mongo:27017";
             // $client = new MongoDB\Client("mongodb://root:1234@mongo:27017/");
