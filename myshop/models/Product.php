@@ -6,16 +6,41 @@ class Product{
     private $client;
     // private $db = "shop1";
     // private $collection_name = "products";
-    private $name;
-    private $productcode;
-    private $price;
-    private $dateofwithdrawal;
-    private $sellername;
-    private $category;
+    public  $name;
+    public  $productcode;
+    public  $price;
+    public  $dateofwithdrawal;
+    public  $sellername;
+    public  $category;
 
     public function __construct($client)
     {
         $this->client = $client;
+    }
+
+      /**
+     * Fuction that creates a document in the products collection.
+     * Returns true if the document was added successfully or false on failure.
+     * 
+     * @return boolean
+     */
+    public function create(){
+        try {
+            $collection = $this->client->shop1->products;
+            $insertOneResult = $collection->insertOne([
+                'NAME' => $this->name,
+                'PRODUCTCODE' => $this->productcode,
+                'PRICE' => $this->price,
+                'DATEOFWITHDRAWAL' => $this->dateofwithdrawal,
+                'SELLERNAME' => $this->sellername,
+                'CATEGORY' => $this->category
+            ]);
+            return $insertOneResult->isAcknowledged();
+ 
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+
     }
 
     /**
@@ -50,5 +75,15 @@ class Product{
         }
         
     }
+
+    /**
+     * Function that queries the products based on the parameter passed as arguments and returns an array with all the product documents or 
+     * an empty array if there aren't any. 
+     * 
+     * @return array
+     */
+    public function read_by_seller($param){
+
+    } 
 }
 ?>
