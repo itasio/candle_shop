@@ -11,43 +11,47 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
     exit;
 }
 
- // Include config file for db connectivity
- require_once "config.php";
-
- //query to run
- //not deleting, just inserting withdrawal date
- //product will be still on our database
- $sql = "UPDATE users 
-         SET NAME = ?, SURNAME = ?, USERNAME = ?, EMAIL = ?, ROLE = ?, CONFIRMED = ? 
-         WHERE ID = ?";
- 
- 
- 
+ $name = $_POST["name"];
+ $surname = $_POST["surname"];
+ $username = $_POST["username"];
+ $email = $_POST["email"];
+ $role_new = $_POST["role"];
 
 
-$name = $_POST["name"];
-$surname = $_POST["surname"];
-$username = $_POST["username"];
-$email = $_POST["email"];
-$role = $_POST["role"];
-$confirmed = $_POST["confirmed"];
-$uID = $_POST["uID"];
+/**Edit user choice was made
+ * We need two calls to keyrock idm 
+ * 1. Update a user
+ * 2. Assign to or Remove a role from user
+ * 
+ * We need info about the current role of the user. If it is different from the one posted, only then it will be changed
+ * Otherwise no changes about user role are made.
+ * That's why we need  a third call to keyrock
+ * 3. Get user information and roles
+ */
 
- if($stmt = $conn->prepare($sql)){
-    // Bind variables to the prepared statement as parameters
-    $stmt->bind_param("sssssss",$name, $surname, $username, $email, $role, $confirmed, $uID);      
-    // Attempt to execute the prepared statement
-    if($stmt->execute()){
-        //delete success
-        echo "User info have been updated successfully!"; 
-        
 
-    }else{
-        echo "Oops! Something went wrong. Please try again later.";
+ /**********Get user information and roles ****************/
 
-    }
-    // Close statement
-    $stmt->close();
- }
+ $curl = curl_init();
+
+curl_setopt_array($curl, array(
+    CURLOPT_URL => 'http://keyrock:3000/user?access_token='.$_SESSION["token"].'',
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => '',
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'GET',
+));
+
+$response = curl_exec($curl);
+
+curl_close($curl);
+$result = json_decode($response);
+
+$userid = $result->id;
+$username = $result->username;
+$curr_role = $result->roles[0]->name;
 
 ?>

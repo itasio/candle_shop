@@ -72,8 +72,8 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                     <label for="pSeller"> <b>Product seller</b> </label>
                     <input type="radio" data-info="role" name="role" id="pSeller" value="PRODUCTSELLER" required> <br>
                     
-                    <label for="admin"> <b>Administrator</b> </label>
-                    <input type="radio" data-info="role" name="role" id="admin" value="ADMIN" required> <br>
+                    <!-- <label for="admin"> <b>Administrator</b> </label>
+                    <input type="radio" data-info="role" name="role" id="admin" value="ADMIN" required> <br> -->
 
                     <!-- <label for="confirmed"> <b>Confirmed</b> </label>
                     <input type="checkbox" name="confirmed" id="confirmed"> <br> -->

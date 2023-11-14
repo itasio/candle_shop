@@ -59,7 +59,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 \"username\": \"".$username."\",
                 \"email\": \"".$email."\",
                 \"password\": \"".$password."\",
-                \"description\": \"".$name." ".$surname."\"
+                \"description\": \"".$name." ".$surname." ".$role."\"   
             }
             }");
 
@@ -113,17 +113,23 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 $appID = "a6fd0e37-f673-4a16-b4b3-213d6d734b91";
                 $roleUserID = "4e95b5a8-13d2-40fc-8de4-c53a403e7a29";
                 $roleProductsellerID = "ba6ed8ca-b388-4b5f-a8aa-3693b4b8ed2f";
-                $roleAdminID = "6eb730a5-28dd-4cf8-a65d-f578727e9ecc";
+                // $roleAdminID = "6eb730a5-28dd-4cf8-a65d-f578727e9ecc";
 
+                /*
+                in this version of the project every user is signed up as a client, even if he wants to be a seller
+                only when the admin selects will he be granted also the role of seller
                 
+                */
                 
-                if ($role == "USER") {
-                    $rolechoiceID =  $roleUserID;
-                }elseif ($role == "PRODUCTSELLER") {
-                    $rolechoiceID = $roleProductsellerID;
-                }elseif ($role == "ADMIN") {
-                    $rolechoiceID = $roleAdminID;
-                }
+                // if ($role == "USER") {
+                //     $rolechoiceID =  $roleUserID;
+                // }elseif ($role == "PRODUCTSELLER") {
+                //     $rolechoiceID = $roleProductsellerID;
+                // }elseif ($role == "ADMIN") {
+                //     $rolechoiceID = $roleAdminID;
+                // }
+
+                $rolechoiceID = $roleUserID;
 
                 $ch = curl_init();
                 curl_setopt($ch, CURLOPT_URL, "http://keyrock:3000/v1/applications/".$appID."/users/".$userid."/roles/".$rolechoiceID."");
@@ -198,8 +204,9 @@ function validInput($name, $surname, $email, $username, $password){
                 <label for="pSeller"> <b>Product seller</b> </label>
                 <input type="radio" name="role" id="pSeller" value="PRODUCTSELLER" required> <br>
                 
-                <label for="admin"> <b>Administrator</b> </label>
-                <input type="radio" name="role" id="admin" value="ADMIN" required> <br>
+                <!-- <label for="admin"> <b>Administrator</b> </label>
+                <input type="radio" name="role" id="admin" value="ADMIN" required> <br> -->
+                <!--  in this version there will be only one admin-->
 
                 <button type="submit">Sign Up</button>
                 
