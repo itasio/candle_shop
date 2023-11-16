@@ -13,8 +13,6 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
 
 //i want to get from keyrock for each user authorized in our app some info
 //specifically ID, NAME, SURNAME, USERNAME, EMAIL, ROLE
-//user cannot be disabled through the api so only the action delete can be made
-//which is done through the delete_user.php file
 
 //i need List roles -> for all roles in our application: role_id, role_name   => create assoc array auth_user[user_id] = role_id
 //i need Authorized users in an application -> user_id, role_id               => create assoc array roles[role_id] = role_name
@@ -114,8 +112,14 @@ if($response){
           $surname = $fullname[1];
           $username = $user['username'];
           $email = $user['email'];
-          $roleid_of_user = $auth_user[$userid];
-          $role_of_user = $roles[$roleid_of_user];
+          if(array_key_exists($userid, $auth_user)){
+            //user is authorized in our app
+            $roleid_of_user = $auth_user[$userid];
+            $role_of_user = $roles[$roleid_of_user];
+          }else{
+            $roleid_of_user = "";
+            $role_of_user = "";
+          }
           echo "<tr id= ". $userid. ">";
 
             echo "<td data-target=\"NAME\">" . $name . "</td>";

@@ -56,10 +56,10 @@ curl_setopt_array($curl, array(
 ));
 
 $response = curl_exec($curl);
-
+$httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 curl_close($curl);
 
-if(!$response){
+if($httpcode != 200){
     exit("An error occured while updating user info.");
 }
 
@@ -81,9 +81,10 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 ));
 
 $response = curl_exec($ch);
+$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
-if(!$response){
-    exit("An error occured while updating user role.");
+if($httpcode != 200){
+    exit("An error occured while updating user's role.");
 }
 
 $result = json_decode($response);
@@ -92,7 +93,13 @@ for ($i=0; $i < $num_of_auth_users; $i++) {
     $auth_user[$result->role_user_assignments[$i]->user_id] = $result->role_user_assignments[$i]->role_id;
 }
 
-$curr_role_id = $auth_user[$user_id];
+//maybe  an app has a user that is not assigned a role yet
+//e.g. admin might have revoked his role
+if(array_key_exists($user_id, $auth_user)){
+    $curr_role_id = $auth_user[$user_id];
+}else{
+    $curr_role_id = "";
+}
 
 /****************************** List roles of application****************************/
 $curl = curl_init();
@@ -111,8 +118,9 @@ curl_setopt_array($curl, array(
 ));
 
 $response = curl_exec($curl);
+$httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 curl_close($curl);
-if(!$response){
+if($httpcode != 200){
     exit("An error occured while updating user role.");
 }
 $result = json_decode($response);
@@ -128,7 +136,6 @@ for ($i=0; $i < $num_of_roles; $i++) {
 
 
 if(in_array($role_new,$roles)){
-	// echo array_search("use", $roles);
 	//new role is in the list of roles
     $new_role_id = array_search($role_new, $roles);
 }else {
@@ -136,8 +143,9 @@ if(in_array($role_new,$roles)){
 }
 
 
-if($curr_role == $role_new){
-    exit("New role is same as the current role");
+if($curr_role_id == $new_role_id){
+    //New role is same as the current role
+    exit("Updates accomplished successfully.");
 }else{
     //first revoke current role from the user and then assign the new role to user
 
@@ -161,8 +169,9 @@ if($curr_role == $role_new){
     ));
 
     $response = curl_exec($curl);
+    $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
-    if (!$response) {
+    if ($httpcode != 204) {
         exit("An error occured while revoking the current role from the user");
     }
 }
@@ -180,9 +189,12 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array(
     "X-Auth-token: ".$_SESSION["x_subj"].""
 ));
 $response = curl_exec($ch);
+$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
 curl_close($ch);
-if (!$response) {
+if ($httpcode != 201) {
     exit("An error occured while assinging new role to the user.");
+}else{
+    echo "User info updated successfully.";
 }
 
 ?>

@@ -27,8 +27,10 @@ curl_setopt($ch, CURLOPT_HTTPHEADER, array(
 ));
 
 $response = curl_exec($ch);
+$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
 curl_close($ch);
-if(!$response){
+if($httpcode != 204){
     exit("An error occured while deleting the user");
 }else{
     echo "User deleted successfully.";

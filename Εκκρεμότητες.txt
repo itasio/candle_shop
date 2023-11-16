@@ -274,3 +274,9 @@ object(stdClass)#7 (1) { ["roles"]=> array(5) { [0]=> object(stdClass)#2 (2) { [
 τα logs εδειχναν να εγκαθιστανται ολα μια χαρα, δεν δημιουργουνταν τα αρχεια.
 
 docker exec -it f717...c8ff /bin/sh
+
+
+!!!!!!!!!!!!!!!! TODO
+Να γίνεται έλεγχος επιτυχίας των API calls μέσω 
+$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE)
+και όχι μέσω response, όπως λέει και το documentation της PHP
