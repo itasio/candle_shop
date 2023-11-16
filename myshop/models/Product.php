@@ -4,12 +4,13 @@ use MongoDB\Exception\Exception;
 
 class Product{
     private $client;
-    // private $db = "shop1";
-    // private $collection_name = "products";
+    // private $db = "Products";
+    // private $collection_name = "product_info";
     public  $name;
     public  $productcode;
     public  $price;
     public  $dateofwithdrawal;
+    public  $quantity;
     public  $sellername;
     public  $category;
 
@@ -26,14 +27,15 @@ class Product{
      */
     public function create(){
         try {
-            $collection = $this->client->shop1->products;
+            $collection = $this->client->Products->product_info; 
             $insertOneResult = $collection->insertOne([
-                'NAME' => $this->name,
-                'PRODUCTCODE' => $this->productcode,
-                'PRICE' => $this->price,
-                'DATEOFWITHDRAWAL' => $this->dateofwithdrawal,
-                'SELLERNAME' => $this->sellername,
-                'CATEGORY' => $this->category
+                'NAME'              => $this->name,
+                'PRODUCTCODE'       => $this->productcode,
+                'PRICE'             => $this->price,
+                'DATEOFWITHDRAWAL'  => $this->dateofwithdrawal,
+                'QUANTITY'          => $this->quantity,
+                'SELLERNAME'        => $this->sellername,
+                'CATEGORY'          => $this->category
             ]);
             return $insertOneResult->isAcknowledged();
  
@@ -51,18 +53,19 @@ class Product{
      */
     public function read_all(){
         try {
-            $collection = $this->client->shop1->products;
+            $collection = $this->client->Products->product_info;
             $cursor = $collection->find();
             $prod_arr = array();
 
             foreach ($cursor as $document) {
                 $prod_item = array(
-                    'name' => $document['NAME'],
-                    'productcode' => $document['PRODUCTCODE'],
-                    'price' => $document['PRICE'],
-                    'dateofwithdrawal' => $document['DATEOFWITHDRAWAL'],
-                    'sellername' => $document['SELLERNAME'],
-                    'category' => $document['CATEGORY']
+                    'name'              => $document['NAME'],
+                    'productcode'       => $document['PRODUCTCODE'],
+                    'price'             => $document['PRICE'],
+                    'dateofwithdrawal'  => $document['DATEOFWITHDRAWAL'],
+                    'quantity'          => $document['QUANTITY'],
+                    'sellername'        => $document['SELLERNAME'],
+                    'category'          => $document['CATEGORY']
                 );
 
                 // Push to post array
