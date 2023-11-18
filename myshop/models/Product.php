@@ -4,8 +4,8 @@ use MongoDB\Exception\Exception;
 
 class Product{
     private $client;
-    // private $db = "Products";
-    // private $collection_name = "product_info";
+    //private $db = "Products";
+    private $collection;
     public  $name;
     public  $productcode;
     public  $price;
@@ -17,6 +17,11 @@ class Product{
     public function __construct($client)
     {
         $this->client = $client;
+        try {
+            $this->collection = $this->client->Products->product_info;
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
     }
 
       /**
@@ -27,8 +32,7 @@ class Product{
      */
     public function create(){
         try {
-            $collection = $this->client->Products->product_info; 
-            $insertOneResult = $collection->insertOne([
+            $insertOneResult = $this->collection->insertOne([
                 'NAME'              => $this->name,
                 'PRODUCTCODE'       => $this->productcode,
                 'PRICE'             => $this->price,
@@ -46,47 +50,50 @@ class Product{
     }
 
     /**
-     * Fuction checks for product documents in the database and returns an array with all the product documents or 
+     * Checks for product documents in the database and returns an array
+     * with all the product documents matching the filter and options criteria or 
      * an empty array if there aren't any.
+     * 
+     * @param array $filter the query criteria(Optional)
+     * @param array $options the desired options e.g. limit, sort etc.(Optional)
      * 
      * @return array
      */
-    public function read_all(){
+    public function read($filter = null, $options = null){
         try {
-            $collection = $this->client->Products->product_info;
-            $cursor = $collection->find();
-            $prod_arr = array();
-
-            foreach ($cursor as $document) {
-                $prod_item = array(
-                    'name'              => $document['NAME'],
-                    'productcode'       => $document['PRODUCTCODE'],
-                    'price'             => $document['PRICE'],
-                    'dateofwithdrawal'  => $document['DATEOFWITHDRAWAL'],
-                    'quantity'          => $document['QUANTITY'],
-                    'sellername'        => $document['SELLERNAME'],
-                    'category'          => $document['CATEGORY']
-                );
-
-                // Push to post array
-                array_push($prod_arr, $prod_item);
+            if ($filter && $options) {
+                $cursor = $this->collection->find($filter, $options);
+            }elseif ($filter) {
+                $cursor = $this->collection->find($filter);
             }
+            elseif ($options) {
+                $cursor = $this->collection->find($options);
+            }else{
+                $cursor = $this->collection->find();
+            }
+            // $prod_arr = array();
+            // foreach ($cursor as $document) {
+            //     $prod_item = array(
+            //         'name'              => $document['NAME'],
+            //         'productcode'       => $document['PRODUCTCODE'],
+            //         'price'             => $document['PRICE'],
+            //         'dateofwithdrawal'  => $document['DATEOFWITHDRAWAL'],
+            //         'quantity'          => $document['QUANTITY'],
+            //         'sellername'        => $document['SELLERNAME'],
+            //         'category'          => $document['CATEGORY']
+            //     );
 
-            return $prod_arr;
+            //     // Push to post array
+            //     array_push($prod_arr, $prod_item);
+            // }
+
+            $data = iterator_to_array($cursor);
+            return $data;
         } catch (\Exception $e) {
             echo $e->getMessage();
         }
         
     }
 
-    /**
-     * Function that queries the products based on the parameter passed as arguments and returns an array with all the product documents or 
-     * an empty array if there aren't any. 
-     * 
-     * @return array
-     */
-    public function read_by_seller($param){
-
-    } 
 }
 ?>
