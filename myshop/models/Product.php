@@ -63,10 +63,11 @@ class Product{
         try {
             if ($filter && $options) {
                 $cursor = $this->collection->find($filter, $options);
-            }elseif ($filter) {
+            }elseif ($filter && !$options) {
                 $cursor = $this->collection->find($filter);
+                // $cursor = $this->collection->find(['name' => 'puppy']);
             }
-            elseif ($options) {
+            elseif (!$filter && $options) {
                 $cursor = $this->collection->find($options);
             }else{
                 $cursor = $this->collection->find();

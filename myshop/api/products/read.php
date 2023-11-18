@@ -1,8 +1,13 @@
 <?php
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
+header('Access-Control-Allow-Methods: POST');
+header('Access-Control-Allow-Headers: Access-Control-Allow-Headers,Content-Type,Access-Control-Allow-Methods, Authorization, X-Requested-With');
 
-if($_SERVER['REQUEST_METHOD'] != 'GET'){
+
+$method = $_SERVER['REQUEST_METHOD'];
+
+if($method != 'POST'){
     header("HTTP/1.0 405 Method Not Allowed");
     exit(json_encode(array('msg'=>'Method not allowed')));
 }
@@ -13,14 +18,39 @@ $database = new Database();
 $client = $database->connect();
 $product = new Product($client);
 
+$data = json_decode(file_get_contents("php://input"));
 
-$result = $product->read();
+$filter = [];
 
+if(isset($data->name)) $filter['NAME'] = $data->name;
+if(isset($data->prod_code)) $filter['PRODUCTCODE'] = $data->prod_code;
+if(isset($data->date)) $filter['DATEOFWITHDRAWAL'] = $data->date;
+if(isset($data->sellers)) $filter['SELLERNAME'] = $data->sellers;
+if(isset($data->categories)) $filter['CATEGORY'] = $data->categories;
+if(isset($data->quantity)) $filter['QUANTITY'] = $data->quantity;
+if(isset($data->maximum) && isset($data->minimum))
+    $filter['PRICE'] = ['$gte' => (float)$data->minimum, '$lte' => (float)$data->maximum];
+
+
+
+
+// $filter['name'] = $data->name ?? null;
+// $filter['productcode']= $data->prod_code ?? null;
+// $filter['price'] = $data->prod_price ?? null;
+// $filter['dateofwithdrawal'] = $data->date ?? null;
+// $filter['sellername'] = $data->sellername ?? null;
+// $filter['category'] = $data->prod_category ?? null;
+// $filter['quantity'] = $data->quantity ?? null;
+
+if(count($filter) > 0)
+    $result = $product->read($filter);  //query all products
+else
+    $result = $product->read();         //query based on parameters
 
 if (count($result) > 0) {
     echo json_encode($result);
 }else{
-    echo json_encode(array('message' => 'There aren\'t any products currently available in our site.'));
+    echo json_encode(array('message' => 'There aren\'t any products currently available in our site matching your criteria.'));
 }
 
 
