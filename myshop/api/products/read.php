@@ -31,17 +31,7 @@ if(isset($data->quantity)) $filter['QUANTITY'] = $data->quantity;
 if(isset($data->maximum) && isset($data->minimum))
     $filter['PRICE'] = ['$gte' => (float)$data->minimum, '$lte' => (float)$data->maximum];
 
-
-
-
-// $filter['name'] = $data->name ?? null;
-// $filter['productcode']= $data->prod_code ?? null;
-// $filter['price'] = $data->prod_price ?? null;
-// $filter['dateofwithdrawal'] = $data->date ?? null;
-// $filter['sellername'] = $data->sellername ?? null;
-// $filter['category'] = $data->prod_category ?? null;
-// $filter['quantity'] = $data->quantity ?? null;
-
+    
 if(count($filter) > 0)
     $result = $product->read($filter);  //query all products
 else

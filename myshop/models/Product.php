@@ -50,6 +50,48 @@ class Product{
     }
 
     /**
+     * Fuction that updates a document in the products collection.
+     * Returns true if the document was modified successfully or false on failure.
+     * 
+     * @return boolean
+     */
+    public function update($data){
+        try {
+            if(isset($data->pID)){ 
+                $filter = ['_id' => new MongoDB\BSON\ObjectID($data->pID)];
+                unset($data->pID); // Remove the 'id' field from the update data
+                $set_fields = [];
+                if(isset($data->name))
+                    $set_fields['NAME'] = $data->name;
+                if(isset($data->pr))
+                    $set_fields['PRICE'] = $data->pr;
+                if(isset($data->pcode))
+                    $set_fields['PRODUCTCODE'] = $data->pcode;
+                if(isset($data->cat))
+                    $set_fields['CATEGORY'] = $data->cat;
+                if(isset($data->quantity))
+                    $set_fields['QUANTITY'] = $data->quantity;
+            }else{
+                return false;
+            }
+            $update = ['$set' => $set_fields];
+            $options = ['upsert' => false];
+    
+            $updateResult = $this->collection->updateOne($filter, $update, $options);
+    
+            if ($updateResult->getMatchedCount() > 0)
+                return true;
+            else{
+                return false;
+                
+            }
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+
+    /**
      * Checks for product documents in the database and returns an array
      * with all the product documents matching the filter and options criteria or 
      * an empty array if there aren't any.
