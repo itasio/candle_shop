@@ -59,7 +59,6 @@ class Product{
         try {
             if(isset($data->pID)){ 
                 $filter = ['_id' => new MongoDB\BSON\ObjectID($data->pID)];
-                unset($data->pID); // Remove the 'id' field from the update data
                 $set_fields = [];
                 if(isset($data->name))
                     $set_fields['NAME'] = $data->name;
@@ -71,6 +70,42 @@ class Product{
                     $set_fields['CATEGORY'] = $data->cat;
                 if(isset($data->quantity))
                     $set_fields['QUANTITY'] = $data->quantity;
+            }else{
+                return false;
+            }
+            $update = ['$set' => $set_fields];
+            $options = ['upsert' => false];
+    
+            $updateResult = $this->collection->updateOne($filter, $update, $options);
+    
+            if ($updateResult->getMatchedCount() > 0)
+                return true;
+            else{
+                return false;
+                
+            }
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+            return false;
+        }
+    }
+
+     /**
+     * Fuction that sets field: date of withdrawal to current date of the matched document in the products collection.
+     * Date is saved in string format
+     * Returns true if the document was modified successfully or false on failure.
+     * Caution: The document is not deleted from the db.
+     * 
+     * @return boolean
+     */
+    public function delete($data){
+        try {
+            if(isset($data->pID)){ 
+                $filter = ['_id' => new MongoDB\BSON\ObjectID($data->pID)];
+                $utc_date_time = new MongoDB\BSON\UTCDateTime();
+                $date_time = $utc_date_time->toDateTime();
+                $date = $date_time->format('Y-m-d');
+                $set_fields['DATEOFWITHDRAWAL'] = $date;
             }else{
                 return false;
             }
@@ -114,22 +149,6 @@ class Product{
             }else{
                 $cursor = $this->collection->find();
             }
-            // $prod_arr = array();
-            // foreach ($cursor as $document) {
-            //     $prod_item = array(
-            //         'name'              => $document['NAME'],
-            //         'productcode'       => $document['PRODUCTCODE'],
-            //         'price'             => $document['PRICE'],
-            //         'dateofwithdrawal'  => $document['DATEOFWITHDRAWAL'],
-            //         'quantity'          => $document['QUANTITY'],
-            //         'sellername'        => $document['SELLERNAME'],
-            //         'category'          => $document['CATEGORY']
-            //     );
-
-            //     // Push to post array
-            //     array_push($prod_arr, $prod_item);
-            // }
-
             $data = iterator_to_array($cursor);
             return $data;
         } catch (\Exception $e) {
