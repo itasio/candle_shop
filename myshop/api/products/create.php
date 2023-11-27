@@ -17,7 +17,7 @@ $product = new Product($client);
 
 $data = json_decode(file_get_contents("php://input"));
 
-//na balw na stelnei kai to sellername me th forma
+//TODO na balw na stelnei kai to sellername me th forma
 
 $product->name = $data->name ?? null;
 $product->productcode = $data->prod_code ?? null;
