@@ -20,6 +20,29 @@ class Order{
             echo $e->getMessage();
         }
     }
+
+    /**
+     * Checks for orders of a user based on the username $filter and returns an array of them,
+     * or an empty array if no orders exist
+     * 
+     * @param string $filter the user username 
+     * @return array
+     * 
+     */
+    public function read($filter){
+        try {
+            if($filter){
+                $cursor = $this->collection->find($filter);
+                $data = iterator_to_array($cursor);
+                return $data;
+            }else{
+                return [];
+            }
+        } catch (\Exception $e) {
+            echo $e->getMessage();
+        }
+    }
+
     /**
      * Creates a document in the Orders collection.
      * Returns true if the document was added successfully or false on failure.

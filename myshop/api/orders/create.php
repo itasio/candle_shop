@@ -18,9 +18,9 @@ $order = new Order($client);
 $data = json_decode(file_get_contents("php://input"));
 
 if($order->create($data)){
-    echo json_encode(array('message'=>'You have successfully added a new product.'));
+    echo json_encode(array('message'=>'You have successfully created a new order.'));
 }else{
-    echo json_encode(array('message'=>'There was an error in product insertion. Try again.'));
+    echo json_encode(array('message'=>'There was an error in order placement. Try again.'));
 }
 
 ?>
