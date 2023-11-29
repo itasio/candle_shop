@@ -142,7 +142,6 @@ class Product{
                 $cursor = $this->collection->find($filter, $options);
             }elseif ($filter && !$options) {
                 $cursor = $this->collection->find($filter);
-                // $cursor = $this->collection->find(['name' => 'puppy']);
             }
             elseif (!$filter && $options) {
                 $cursor = $this->collection->find($options);

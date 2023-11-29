@@ -22,12 +22,13 @@ $data = json_decode(file_get_contents("php://input"));
 if(isset($data->user_username)){
     $filter['USER_USERNAME'] = $data->user_username;
     $result = $order->read($filter);
-    if (count($result) > 0) {
-        echo json_encode($result);
-    }else{
-        echo json_encode(array('message' => 'There aren\'t any orders for the requested user in our site.'));
-    }
+    echo json_encode($result);
+    // if (count($result) > 0) {
+    //     echo json_encode($result);
+    // }else{
+    //     echo json_encode(array('message' => 'There aren\'t any orders for the requested user in our site.'));
+    // }
 }else{
-    echo json_encode(array('message' => 'An error occured with the username requested.'));
+    echo json_encode(array());
 }
 ?>

@@ -24,7 +24,16 @@ $filter = [];
 
 if(isset($data->name)) $filter['NAME'] = $data->name;
 if(isset($data->prod_code)) $filter['PRODUCTCODE'] = $data->prod_code;
-if(isset($data->date)) $filter['DATEOFWITHDRAWAL'] = $data->date;
+if(isset($data->date)){ 
+    // show products that have withdrawed later from the selected date or they are available
+    // $filter['DATEOFWITHDRAWAL'] = ['$gte' =>$data->date, '$eq' => ''];
+    $filter = [
+        '$or' => [
+            ['DATEOFWITHDRAWAL' => ['$gt' => $data->date]],
+            ['DATEOFWITHDRAWAL' => ['$eq' => '']],
+        ]
+    ];
+}
 if(isset($data->sellers)) $filter['SELLERNAME'] = $data->sellers;
 if(isset($data->categories)) $filter['CATEGORY'] = $data->categories;
 if(isset($data->quantity)) $filter['QUANTITY'] = $data->quantity;
@@ -37,11 +46,11 @@ if(count($filter) > 0)
 else
     $result = $product->read();         //query based on parameters
 
-if (count($result) > 0) {
-    echo json_encode($result);
-}else{
-    echo json_encode(array('message' => 'There aren\'t any products currently available in our site matching your criteria.'));
-}
-
+// if (count($result) > 0) {
+//     echo json_encode($result);
+// }else{
+//     echo json_encode(array('message' => 'There aren\'t any products currently available in our site matching your criteria.'));
+// }
+echo json_encode($result);
 
 ?>

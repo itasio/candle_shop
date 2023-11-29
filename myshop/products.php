@@ -214,7 +214,6 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
         }
 
         function getProducts() {
-            //var param = 'criterion=all';
             console.log(frm);
             frm.innerHTML="";
             xhttp = new XMLHttpRequest();
@@ -225,7 +224,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                     frm.innerHTML = this.responseText;
                 }
             };
-            //xhttp.send(param);
+            xhttp.send();
         }
 
         $(document).ready(function(){
