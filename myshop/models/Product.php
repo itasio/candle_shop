@@ -152,8 +152,20 @@ class Product{
             return $data;
         } catch (\Exception $e) {
             echo $e->getMessage();
+        }   
+    }
+
+    /**
+     * Find disinct values of the collection in which the product belongs.
+     * Currently only for sellername and category
+     */
+    public function find_distinct($param){
+        try {
+            $distinctValues = $this->collection->distinct($param);
+             return $distinctValues;
+        } catch (\Exception $e) {
+            echo $e->getMessage();
         }
-        
     }
 
 }

@@ -187,7 +187,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
         //return a dropdown list of product categories to choose from in order to search based
         //on category
         function getCategoriesList(field){
-            var param = "CATEGORY";
+            var param = "category";
             xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
@@ -201,7 +201,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
         //return a dropdown list of sellers to choose from in order to search based
         //on productseller
         function getSellersList(field) {
-            var param = "PRODUCTSELLER";
+            var param = "productseller";
             xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
@@ -217,7 +217,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
             console.log(frm);
             frm.innerHTML="";
             xhttp = new XMLHttpRequest();
-            xhttp.open("POST", "get_products_NEW.php", true);
+            xhttp.open("POST", "get_products.php", true);
             xhttp.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
@@ -266,7 +266,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
             $("form").submit(function (event) {
 
                 event.preventDefault();
-                var addr = "get_products_NEW.php";
+                var addr = "get_products.php";
                 //get the data from the input fields
                 if($('#submit_button').data("target") == "NAME"){
                     var name = $('#prod_name').val();                

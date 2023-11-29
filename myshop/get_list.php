@@ -9,51 +9,44 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
     header("location: index.php");
     exit;
 }
-
- // Include config file for db connectivity
- require_once "config.php";
-
-define("category", "CATEGORY");
-define("productseller", "PRODUCTSELLER");
 $param = $_GET['q'];
+$curl = curl_init();
 
-if($param == productseller){
-    //query to run
-    $sql = "SELECT ID, USERNAME FROM users WHERE ROLE = 'PRODUCTSELLER'";
+curl_setopt_array($curl, array(
+  CURLOPT_URL => 'http://php-apache-environment:80/api/products/distinct.php?q='.$param.'',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'GET',
+));
 
-    $result = $conn->query($sql);
-    if($result){
-        echo "<label for=\"sellers\">Choose a product seller:</label>";
-        echo "<select name=\"sellers\" id=\"sellers\">";
-        while ($row = $result->fetch_assoc()) {
-            echo "<option value=".$row['USERNAME'].">". $row['USERNAME'] ."</option>";
-        }
-        echo "</select>";
-        echo "<br>";
-    }else{
-        echo "Oops! Something went wrong. Please try again later.";
-    }
-}elseif($param == category){
-    //query to run
-    $sql = "SELECT DISTINCT CATEGORY FROM products";
+$response = curl_exec($curl);
+$httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-    $result = $conn->query($sql);
-    if($result){
-        echo "<label for=\"categories\">Choose a product category:</label>";
-        echo "<select name=\"categories\" id=\"categories\">";
-        while ($row = $result->fetch_assoc()) {
-            echo "<option value=".$row[category].">". $row[category] ."</option>";
-        }
-        echo "</select>";
-        echo "<br>";
-    }else{
-        echo "Oops! Something went wrong. Please try again later.";
-    }
-}else{
-    echo "Oops! Something went wrong. Please try again later.";
+curl_close($curl);
+if($httpcode != 200){
+    exit("An error occured while requesting products info.". curl_error($curl));
 }
-    // Close connection
-    $conn->close();
+$result = json_decode($response, true);
 
-
+if($param == "productseller"){
+    echo "<label for=\"sellers\">Choose a product seller:</label>";
+    echo "<select name=\"sellers\" id=\"sellers\">";
+    foreach ($result as $item) {
+        echo "<option value=".$item.">". $item ."</option>";
+    }
+    echo "</select>";
+    echo "<br>";
+}elseif ($param == "category") {
+    echo "<label for=\"categories\">Choose a product category:</label>";
+    echo "<select name=\"categories\" id=\"categories\">";
+    foreach ($result as $item) {
+        echo "<option value=".$item.">". $item ."</option>";
+    }
+    echo "</select>";
+    echo "<br>";
+}
 ?>
