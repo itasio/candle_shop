@@ -27,6 +27,7 @@ $product->sellername = $data->sellername ?? null;
 $product->category = $data->prod_category ?? null;
 $product->quantity = $data->quantity ?? null;
 if($product->create()){
+    header("HTTP/1.0 201 Created");
     echo json_encode(array('msg'=>'You have successfully added a new product.'));
 }else{
     echo json_encode(array('msg'=>'There was an error in product insertion. Try again.'));

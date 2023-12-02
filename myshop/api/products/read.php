@@ -34,10 +34,12 @@ if(isset($data->date)){
         ]
     ];
 }
-if($data->status == 'active'){
-    $filter['DATEOFWITHDRAWAL'] = ['$eq' => ''];
-}elseif ($data->status == 'withdrawed') {
-    $filter['DATEOFWITHDRAWAL'] = ['$ne' => ''];
+if(isset($data->status)){
+    if($data->status == 'active'){
+        $filter['DATEOFWITHDRAWAL'] = ['$eq' => ''];
+    }elseif ($data->status == 'withdrawed') {
+        $filter['DATEOFWITHDRAWAL'] = ['$ne' => ''];
+    }
 }
 if(isset($data->sellers)) $filter['SELLERNAME'] = $data->sellers;
 if(isset($data->categories)) $filter['CATEGORY'] = $data->categories;

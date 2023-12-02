@@ -44,7 +44,8 @@ class Product{
             return $insertOneResult->isAcknowledged();
  
         } catch (\Exception $e) {
-            echo $e->getMessage();
+            // echo $e->getMessage();
+            return false;
         }
 
     }
@@ -70,6 +71,8 @@ class Product{
                     $set_fields['CATEGORY'] = $data->cat;
                 if(isset($data->quantity))
                     $set_fields['QUANTITY'] = $data->quantity;
+                if(isset($data->dateofwithdrawal) && $data->dateofwithdrawal == "")
+                    $set_fields['DATEOFWITHDRAWAL'] = $data->dateofwithdrawal;
             }else{
                 return false;
             }
@@ -85,7 +88,7 @@ class Product{
                 
             }
         } catch (\Exception $e) {
-            echo $e->getMessage();
+            //echo $e->getMessage();
             return false;
         }
     }
@@ -121,7 +124,7 @@ class Product{
                 
             }
         } catch (\Exception $e) {
-            echo $e->getMessage();
+            // echo $e->getMessage();
             return false;
         }
     }

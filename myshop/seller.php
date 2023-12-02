@@ -16,9 +16,6 @@ $msg="";
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     
 
-    // Include config file for db connectivity
-    require_once "config.php";
-
     if(isset($_POST["name"]) && isset($_POST["prod_code"]) && isset($_POST["prod_price"]) && isset($_POST["prod_category"]))
     {
 
@@ -29,54 +26,115 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $username = $_SESSION["username"];
         if(!validInput($name, $prod_code, $prod_price, $prod_category)){
             $msg =  'You cannot submit blank fields';
-        }
-       
-       
-       else{
+        }else{
 
             //check if user tries to insert a product that has been deleted in the past
             // if so make date of withdrawal null and update info, otherwise make insertion
-            $sql = "SELECT * FROM products where PRODUCTCODE = '$prod_code' and CATEGORY = '$prod_category' and DATEOFWITHDRAWAL IS NOT NULL";
-            $result = $conn->query($sql);
-            if ($result->num_rows == 1) {
-                //update 
-                $sql ="UPDATE products SET DATEOFWITHDRAWAL = NULL, NAME = '$name', PRICE = '$prod_price' WHERE PRODUCTCODE = '$prod_code' and CATEGORY = '$prod_category'";
-                $result = $conn->query($sql);
-                if($result){
-                        
-                    $msg = 'The deleted product is available again with updated info';
-    
-                } else{
-                    $msg =  "An unexpected error occured. Please try again later.". "Error: " . "<br>" . $conn->error;
-                }
-            }else{
+            $curl = curl_init();
 
-                $sql = "INSERT INTO products(NAME, PRODUCTCODE, PRICE, SELLERNAME, CATEGORY) 
-                VALUES ('$name', '$prod_code', '$prod_price', '$username','$prod_category')";
-                
-
-                try {
-                    $result = $conn->query($sql);
-                    
-                    if($result){
-                        
-                        $msg = 'You have successfully added a new product.';
-        
-                    } else{
-                        $msg =  "An unexpected error occured. Please try again later." . "<br>" . "Important notice: Products with the same code can't belong in the same category.";
-                    }
-                } catch (\Throwable $th) {
-                    $msg =  "An unexpected error occured. You cannot insert the same product twice.";
-                }
+            curl_setopt_array($curl, array(
+              CURLOPT_URL => 'http://php-apache-environment:80/api/products/read.php',
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => '',
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 0,
+              CURLOPT_FOLLOWLOCATION => true,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => 'POST',
+              CURLOPT_POSTFIELDS =>'{
+                "sellers":"'.$username.'",
+                "status":"withdrawed",
+                "categories":"'.$prod_category.'",
+                "prod_code":"'.$prod_code.'"
+            }',
+              CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+              ),
+            ));
             
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+
+            if($httpcode != 200){
+                $msg = "An unexpected error occured, please try again later.";
+            }
+
+            $result = json_decode($response, true);
+
+
+            if (count($result)== 1) {
+                //update
+                $pid = $result["_id"]["\$oid"];
+
+                // $sql ="UPDATE products SET DATEOFWITHDRAWAL = NULL, NAME = '$name', PRICE = '$prod_price' WHERE PRODUCTCODE = '$prod_code' and CATEGORY = '$prod_category'";
+
+                $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'http://php-apache-environment:80/api/products/update.php',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'PATCH',
+                    CURLOPT_POSTFIELDS =>'{
+                        "pID":"'.$pid.'",
+                        "name":"'.$name.'",
+                        "pr":'.$prod_price.',
+                        "dateofwithdrawal":""
+                    }',
+                    CURLOPT_HTTPHEADER => array(
+                        'Content-Type: application/json'
+                    ),
+                ));
+
+                $response = curl_exec($curl);
+                $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                curl_close($curl);
+                if($httpcode != 200)
+                    $msg =  "An unexpected error occured. Please try again later.". "Error: " . "<br>" . curl_error($curl);
+                else
+                    $msg = 'The deleted product is available again with updated info';
+            }else{
+                //insert
+                $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                CURLOPT_URL => 'http://php-apache-environment:80/api/products/create.php',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS =>'{
+                    "name": "'.$name.'",
+                    "prod_code":"'.$prod_code.'",
+                    "prod_price":'.$prod_price.',
+                    "sellername":"'.$username.'",
+                    "prod_category":"'.$prod_category.'"
+                }',
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json'
+                ),
+                ));
+
+                $response = curl_exec($curl);
+                $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                curl_close($curl);
+
+                if($httpcode != 201)
+                    $msg =  "An unexpected error occured. Please try again later.". "Error: " . "<br>" . curl_error($curl);
+                else
+                    $msg = 'You have successfully added a new product.';
+
             }
         }
     }
-
-
-
- $conn->close();
-
 } 
 
 function validInput($name, $prod_code, $prod_price, $prod_category){
@@ -294,7 +352,7 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                         frm.innerHTML = this.responseText;
                     }
                 };
-                xhttp.open("GET", "get_active_seller_products.php", true);
+                xhttp.open("GET", "get_active_seller_products_NEW.php", true);
                 xhttp.send();
                 return;
 
@@ -314,7 +372,7 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                         frm.innerHTML = this.responseText;
                     }
                 };
-                xhttp.open("GET", "get_deleted_seller_products.php", true);
+                xhttp.open("GET", "get_deleted_seller_products_NEW.php", true);
                 xhttp.send();
                 return;
             }
@@ -329,7 +387,7 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
             $(document).on('click', 'button[data-role=delete]', function(){
                 var param = $(this).data('id');
                 $.ajax({
-                    url     : "delete_product.php",
+                    url     : "delete_product_NEW.php",
                     method  : "POST",
                     data    : {identity : param},
                     success : function(response){
@@ -377,7 +435,7 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                 var pID =  $('#pID').val();
                 document.getElementById("edit_form").style.display = "none";
                 $.ajax({
-                    url     : "edit_product.php",
+                    url     : "edit_product_NEW.php",
                     method  : "POST",
                     data    : {name : name, pcode : pcode, pr : pr, cat : cat, pID : pID},
                     success : function(response){
@@ -409,7 +467,7 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                     frm.innerHTML = this.responseText;
                 }
             };
-            xhttp.open("GET", "get_active_seller_products.php", true);
+            xhttp.open("GET", "get_active_seller_products_NEW.php", true);
             xhttp.send();
         }
 
