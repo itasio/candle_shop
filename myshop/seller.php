@@ -66,7 +66,9 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
 
             if (count($result)== 1) {
                 //update
-                $pid = $result["_id"]["\$oid"];
+                foreach($result as $key)
+                    $pid = $key["_id"]["\$oid"];
+                //$pid = $result["_id"]["\$oid"];
 
                 // $sql ="UPDATE products SET DATEOFWITHDRAWAL = NULL, NAME = '$name', PRICE = '$prod_price' WHERE PRODUCTCODE = '$prod_code' and CATEGORY = '$prod_category'";
 
@@ -85,6 +87,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                         "pID":"'.$pid.'",
                         "name":"'.$name.'",
                         "pr":'.$prod_price.',
+                        "quantity":'.$quantity.',
                         "dateofwithdrawal":""
                     }',
                     CURLOPT_HTTPHEADER => array(
