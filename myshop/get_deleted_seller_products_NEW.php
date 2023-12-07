@@ -43,8 +43,7 @@ if($httpcode != 200){
 $result = json_decode($response, true);
 
 if(count($result) == 0){
-    echo  "You have not any products currently available in our site. You can a
-    add one from our menu.";
+    echo  "You don't have any products withdrawed in our site.";
 }else{
     echo "<table>";
     echo "<tr>";
@@ -52,6 +51,7 @@ if(count($result) == 0){
         echo "<th>product code</th>";
         echo "<th>price</th>";
         echo "<th>category</th>";
+        echo "<th>quantity</th>";
         echo "<th>withdrawal date</th>";
     echo "</tr>";
 
@@ -70,6 +70,7 @@ if(count($result) == 0){
             echo "<td>" . $productcode . "</td>";
             echo "<td>" . $price . "</td>";
             echo "<td>" . $category . "</td>";
+            echo "<td>" . $quantity . "</td>";
             echo "<td>" . $dateofwithdrawal . "</td>";
         echo "</tr>";
     }

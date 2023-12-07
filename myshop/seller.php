@@ -16,7 +16,7 @@ $msg="";
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     
 
-    if(isset($_POST["name"]) && isset($_POST["prod_code"]) && isset($_POST["prod_price"]) && isset($_POST["prod_category"]))
+    if(isset($_POST["name"]) && isset($_POST["prod_code"]) && isset($_POST["prod_price"]) && isset($_POST["prod_category"]) && isset($_POST["quantity"]))
     {
 
         $name = $_POST["name"];
@@ -24,7 +24,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $prod_price = $_POST["prod_price"];
         $prod_category = $_POST["prod_category"];
         $username = $_SESSION["username"];
-        if(!validInput($name, $prod_code, $prod_price, $prod_category)){
+        $quantity = $_POST["quantity"];
+        if(!validInput($name, $prod_code, $prod_price, $prod_category, $quantity)){
             $msg =  'You cannot submit blank fields';
         }else{
 
@@ -116,6 +117,7 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                     "prod_code":"'.$prod_code.'",
                     "prod_price":'.$prod_price.',
                     "sellername":"'.$username.'",
+                    "quantity":'.$quantity.',
                     "prod_category":"'.$prod_category.'"
                 }',
                 CURLOPT_HTTPHEADER => array(
@@ -137,8 +139,8 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
     }
 } 
 
-function validInput($name, $prod_code, $prod_price, $prod_category){
-    if(empty(trim($name)) || empty(trim($prod_code)) ||empty(trim($prod_price)) || empty(trim($prod_category)))
+function validInput($name, $prod_code, $prod_price, $prod_category, $quantity){
+    if(empty(trim($name)) || empty(trim($prod_code)) ||empty(trim($prod_price)) || empty(trim($prod_category)) || empty(trim($quantity)))
         return false;
     return true;
 }
@@ -208,6 +210,9 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
 
                     <label for="product_category"><b>Product category</b></label>
                     <input id="product_category" type="text" name="product_category" required class = "inputFields"> <br>
+
+                    <label for="quantity"><b>Product category</b></label>
+                    <input id="quantity" type="number" name="quantity" required class = "inputFields"> min="1" <br>
 
                     <input id="pID" type ="hidden" class = "inputFields">
 
@@ -315,11 +320,30 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                 form.appendChild(label_name);
                 form.appendChild(br.cloneNode());
 
-                //input for product code
+                //input for product category
                 var inp = document.createElement("input");
                 inp.setAttribute("type", "text");
                 inp.setAttribute("name", "prod_category");
                 inp.setAttribute("id", "prod_category");
+                inp.required = true;
+                //append product code input to the form element
+                form.appendChild(inp);
+                form.appendChild(br.cloneNode());
+
+                //label for quantity
+                var label_name = document.createElement("label");
+                label_name.setAttribute("for","quantity");
+                label_name.innerHTML = "Quantity";
+                //append label to the form element
+                form.appendChild(label_name);
+                form.appendChild(br.cloneNode());
+
+                //input for quantity
+                var inp = document.createElement("input");
+                inp.setAttribute("type", "number");
+                inp.setAttribute("name", "quantity");
+                inp.setAttribute("id", "quantity");
+                inp.setAttribute("min", "1");
                 inp.required = true;
                 //append product code input to the form element
                 form.appendChild(inp);
@@ -413,12 +437,14 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                 var pcode = $('#'+id).children('td[data-target=PRODUCTCODE]').text();
                 var pr = $('#'+id).children('td[data-target=PRICE]').text();
                 var cat = $('#'+id).children('td[data-target=CATEGORY]').text();
+                var quantity = $('#'+id).children('td[data-target=QUANTITY]').text();
 
                 //append values of table into input fields
                 $('#product_name').val(name);
                 $('#product_code').val(pcode);
                 $('#product_price').val(pr);
                 $('#product_category').val(cat);
+                $('#quantity').val(quantity);
                 $('#pID').val(id);
 
             })
@@ -432,12 +458,13 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                 var pcode = $('#product_code').val();
                 var pr = $('#product_price').val();
                 var cat =  $('#product_category').val();
+                var quantity =  $('#quantity').val();
                 var pID =  $('#pID').val();
                 document.getElementById("edit_form").style.display = "none";
                 $.ajax({
                     url     : "edit_product_NEW.php",
                     method  : "POST",
-                    data    : {name : name, pcode : pcode, pr : pr, cat : cat, pID : pID},
+                    data    : {name : name, pcode : pcode, pr : pr, cat : cat, quantity : quantity, pID : pID},
                     success : function(response){
                               //now reloading the data from the database
                               loadActiveProducts(frm);

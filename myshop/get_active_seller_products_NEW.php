@@ -43,7 +43,7 @@ if($httpcode != 200){
 $result = json_decode($response, true);
 
 if(count($result) == 0){
-    echo  "You have not any products currently available in our site. You can a
+    echo  "You don't have any products currently available in our site.<br>You can a
     add one from our menu.";
 }else{
     echo "<table>";
@@ -52,6 +52,7 @@ if(count($result) == 0){
         echo "<th>product code</th>";
         echo "<th>price</th>";
         echo "<th>category</th>";
+        echo "<th>quantity</th>";
         echo "<th>edit</th>";
         echo "<th>delete</th>";
     echo "</tr>";
@@ -71,6 +72,7 @@ if(count($result) == 0){
             echo "<td data-target=\"PRODUCTCODE\">" . $productcode . "</td>";
             echo "<td data-target=\"PRICE\">" . $price . "</td>";
             echo "<td data-target=\"CATEGORY\">" . $category . "</td>";
+            echo "<td data-target=\"QUANTITY\">" . $quantity . "</td>";
             echo "<td>" ."<button data-role= \"edit\" data-id= ". $id." \"> Edit </button> </td>";
             echo "<td>" ."<button data-role= \"delete\" data-id= ". $id." \"> Delete </button> </td>";
         echo "</tr>";
