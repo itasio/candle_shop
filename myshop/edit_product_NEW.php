@@ -18,13 +18,12 @@ $pcode = $_POST["pcode"] ?? exit($msg);
 $pr = $_POST["pr"] ?? exit($msg);
 $cat = $_POST["cat"] ?? exit($msg);
 $pID = $_POST["pID"] ?? exit($msg);
-// $quantity  = $_POST["quantity"] ?? exit($msg);
-#TODO na mporw na kanw edit to quantity!!
+$quantity  = $_POST["quantity"] ?? exit($msg);
 
 $curl = curl_init();
 
 curl_setopt_array($curl, array(
-  CURLOPT_URL => 'http://php-apache-enviroment:80/api/products/update.php',
+  CURLOPT_URL => 'http://php-apache-environment:80/api/products/update.php',
   CURLOPT_RETURNTRANSFER => true,
   CURLOPT_ENCODING => '',
   CURLOPT_MAXREDIRS => 10,
@@ -36,6 +35,7 @@ curl_setopt_array($curl, array(
     "pID":"'.$pID.'",
     "name":"'.$name.'",
     "pr":'.$pr.',
+    "quantity":'.$quantity.',
     "pcode":"'.$pcode.'",
     "cat":"'.$cat.'"
 }',
@@ -47,8 +47,9 @@ curl_setopt_array($curl, array(
 $response = curl_exec($curl);
 $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 curl_close($curl);
-if($httpcode != 200)
+if($httpcode != 200){
     echo $msg;
+}
 else
     echo "Your product has been updated successfully!";
 ?>

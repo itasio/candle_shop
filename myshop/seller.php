@@ -214,8 +214,8 @@ function validInput($name, $prod_code, $prod_price, $prod_category, $quantity){
                     <label for="product_category"><b>Product category</b></label>
                     <input id="product_category" type="text" name="product_category" required class = "inputFields"> <br>
 
-                    <label for="quantity"><b>Product category</b></label>
-                    <input id="quantity" type="number" name="quantity" required class = "inputFields"> min="1" <br>
+                    <label for="quantity"><b>Quantity</b></label>
+                    <input id="quantity" type="number" name="quantity" required class = "inputFields" min="1">  <br>
 
                     <input id="pID" type ="hidden" class = "inputFields">
 

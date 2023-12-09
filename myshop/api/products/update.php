@@ -18,13 +18,14 @@ $database = new Database();
 $client = $database->connect();
 $product = new Product($client);
 
+
 $data = json_decode(file_get_contents("php://input"));
 // $response = $product->update($data);
 if($product->update($data)){
     echo(json_encode(array('msg'=>'Info updated successfully')));
 }else{
     header("HTTP/1.0 400 Bad Request");
-    echo(json_encode(array('msg'=>'An error occured. Plaese try again')));
+    echo(json_encode(array('msg'=>'An error occured. Please try again')));
 }
 
 ?>
