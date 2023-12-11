@@ -57,6 +57,16 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                 $_SESSION["cart"][$id]["quantity"] -=1;
                 echo "The quantity of items in your cart has been decreased.";
             }
+        }elseif ($_POST["op"] == "clear") {
+            $_SESSION["cart"] = array();
+            $_SESSION["sum_of_cart"] = 0;
+            if(count($_SESSION["cart"]) == 0 && $_SESSION["sum_of_cart"] == 0)
+                echo "Your cart is now empty.";
+            else
+                echo "An error occured while clearing your cart.";
+        }elseif ($_POST["op"] == "order") {
+            //send request to the Orders Service API to place order
+            //reminder: order will have status: PENDING
         }
 }
 ?>

@@ -42,6 +42,13 @@ else{
     echo "<div id = \"sum_container\">";
     echo "<b style=\"color: black;\">".$_SESSION["sum_of_cart"]."</b>";
     echo "</div>";
+    echo "<div id = \"clear_cart\">";
+    echo "<button data-role= \"clear\" \"> Clear cart </button>";
+    echo "</div>";
+    echo "<div id = \"place_order\">";
+    echo "<button data-role= \"place_order\" \"> Place your order </button>";
+    echo "</div>";
+
 
 }
 ?>

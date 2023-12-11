@@ -87,6 +87,37 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                 });
             })
 
+                //remove from cart choice made
+            $(document).on('click', 'button[data-role=clear]', function(){
+                $.ajax({
+                    url     : "edit_cart.php",
+                    method  : "POST",
+                    data    : {"op" : "clear"},
+                    success : function(response){
+                            window.alert(response);
+                            draw_cart();
+                    },
+                    error   : function(xhr){
+                        window.alert("An error occured: " + xhr.status + " " + xhr.statusText);
+                    }
+                });
+            })
+
+            $(document).on('click', 'button[data-role=place_order]', function(){
+                $.ajax({
+                    url     : "edit_cart.php",
+                    method  : "POST",
+                    data    : {"op" : "order"},
+                    success : function(response){
+                            window.alert(response);
+                            draw_cart();
+                    },
+                    error   : function(xhr){
+                        window.alert("An error occured: " + xhr.status + " " + xhr.statusText);
+                    }
+                });
+            })
+
         })
     </script>
 </body>
