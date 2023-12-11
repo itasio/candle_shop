@@ -18,6 +18,7 @@ $order = new Order($client);
 $data = json_decode(file_get_contents("php://input"));
 
 if($order->create($data)){
+    header("HTTP/1.0 201 Created");
     echo json_encode(array('msg'=>'You have successfully created a new order.'));
 }else{
     echo json_encode(array('msg'=>'There was an error in order placement. Try again.'));

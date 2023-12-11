@@ -60,13 +60,61 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         }elseif ($_POST["op"] == "clear") {
             $_SESSION["cart"] = array();
             $_SESSION["sum_of_cart"] = 0;
-            if(count($_SESSION["cart"]) == 0 && $_SESSION["sum_of_cart"] == 0)
-                echo "Your cart is now empty.";
-            else
-                echo "An error occured while clearing your cart.";
+            echo "Your cart is now empty.";
+
         }elseif ($_POST["op"] == "order") {
             //send request to the Orders Service API to place order
             //reminder: order will have status: PENDING
+
+            $order_info = new stdClass();
+
+            $order_info-> total_price = $_SESSION["sum_of_cart"];
+            $order_info->user_username = $_SESSION["username"];
+            $order_info->products = array();
+
+            foreach($_SESSION["cart"] as $product => $product_data){
+                $info_array = $product_data;
+                $pushed_data = ["name"       => $info_array["name"],
+                                "amount"     => $info_array["quantity"],
+                                "PRODUCT_ID" => $product              
+                               ];
+
+                
+                $order_info->products[] = $pushed_data; //push to array
+            }
+
+            $post_data = json_encode($order_info);  
+
+            $curl = curl_init();
+
+            curl_setopt_array($curl, array(
+            CURLOPT_URL => 'http://php-apache-environment:80/api/orders/create.php',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'POST',
+            CURLOPT_POSTFIELDS =>$post_data,
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+            ));
+
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+
+            if($httpcode != 201){
+                echo "Oops something went wrong with your order. Please try again.";
+            }else{
+                echo"Congrats your order was placed successfully.\nStatus: Pending\n";
+                //Also clear the cart
+                $_SESSION["cart"] = array();
+                $_SESSION["sum_of_cart"] = 0;
+                echo "Your cart is now empty. Head to My Orders to review your order.";
+            }
         }
 }
 ?>
