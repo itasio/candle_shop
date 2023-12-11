@@ -15,6 +15,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
     <meta name="viewport" content="width=device-width, initial-scale=1"s>
     <meta charset = "UTF-8">
     <link rel="stylesheet" href="styles_main_site.css">
+    <link rel="icon" href="favicon.png" />
     <title> Products page</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 </head>

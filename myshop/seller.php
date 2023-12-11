@@ -156,6 +156,7 @@ function validInput($name, $prod_code, $prod_price, $prod_category, $quantity){
     <meta name="viewport" content="width=device-width, initial-scale=1"s>
     <meta charset = "UTF-8">
     <link rel="stylesheet" href="styles_main_site.css">
+    <link rel="icon" href="favicon.png" />
     <title> Seller page</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 </head>

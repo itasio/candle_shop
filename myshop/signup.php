@@ -167,6 +167,7 @@ function validInput($name, $surname, $email, $username, $password){
     <meta charset = "UTF-8">
     <title> Signup page</title>
     <link rel="stylesheet" href="styles_index_signup.css">
+    <link rel="icon" href="favicon.png" />
 </head>
 
 <body>

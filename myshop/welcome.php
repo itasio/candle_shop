@@ -16,7 +16,9 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
 <head>
     <meta name="viewport" content="width=device-width, initial-scale=1"s>
     <meta charset = "UTF-8">
+    <link rel="icon" href="favicon.png" />
     <link rel="stylesheet" href="styles_main_site.css">
+    
     <title> Welcome page</title>
 </head>
 

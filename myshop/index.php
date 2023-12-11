@@ -263,6 +263,7 @@ function validInput($email, $password){
     <meta charset = "UTF-8">
     <title> Login page</title>
     <link rel="stylesheet" href="styles_index_signup.css">
+    <link rel="icon" href="favicon.png" />
 </head>
 
 <body>
