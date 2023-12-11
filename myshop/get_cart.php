@@ -16,7 +16,7 @@ else{
     echo "<h2>These are your cart info</h2>";
     echo "<table>";
     echo "<tr>";
-    echo    "<th>Code</th>";
+    echo    "<th>Product id</th>";
     echo    "<th>Name</th>";
     echo    "<th>Price</th>";
     echo    "<th>Category</th>";

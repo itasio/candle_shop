@@ -379,7 +379,7 @@ function validInput($name, $prod_code, $prod_price, $prod_category, $quantity){
                         frm.innerHTML = this.responseText;
                     }
                 };
-                xhttp.open("GET", "get_active_seller_products_NEW.php", true);
+                xhttp.open("GET", "get_active_seller_products.php", true);
                 xhttp.send();
                 return;
 
@@ -399,7 +399,7 @@ function validInput($name, $prod_code, $prod_price, $prod_category, $quantity){
                         frm.innerHTML = this.responseText;
                     }
                 };
-                xhttp.open("GET", "get_deleted_seller_products_NEW.php", true);
+                xhttp.open("GET", "get_deleted_seller_products.php", true);
                 xhttp.send();
                 return;
             }
@@ -414,7 +414,7 @@ function validInput($name, $prod_code, $prod_price, $prod_category, $quantity){
             $(document).on('click', 'button[data-role=delete]', function(){
                 var param = $(this).data('id');
                 $.ajax({
-                    url     : "delete_product_NEW.php",
+                    url     : "delete_product.php",
                     method  : "POST",
                     data    : {identity : param},
                     success : function(response){
@@ -465,7 +465,7 @@ function validInput($name, $prod_code, $prod_price, $prod_category, $quantity){
                 var pID =  $('#pID').val();
                 document.getElementById("edit_form").style.display = "none";
                 $.ajax({
-                    url     : "edit_product_NEW.php",
+                    url     : "edit_product.php",
                     method  : "POST",
                     data    : {name : name, pcode : pcode, pr : pr, cat : cat, quantity : quantity, pID : pID},
                     success : function(response){
@@ -497,7 +497,7 @@ function validInput($name, $prod_code, $prod_price, $prod_category, $quantity){
                     frm.innerHTML = this.responseText;
                 }
             };
-            xhttp.open("GET", "get_active_seller_products_NEW.php", true);
+            xhttp.open("GET", "get_active_seller_products.php", true);
             xhttp.send();
         }
 

@@ -54,6 +54,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
     <script>
         var frm = document.getElementById("table1");
         var sc =  document.getElementById("sum_container");
+
         function draw_cart(){
             frm.innerHTML = "";
             xhttp = new XMLHttpRequest();
@@ -71,11 +72,11 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
  
             //remove from cart choice made
             $(document).on('click', 'button[data-role=remove]', function(){
-                var code = $(this).data('id');
+                var id = $(this).data('id');
                 $.ajax({
                     url     : "edit_cart.php",
                     method  : "POST",
-                    data    : {"op" : "remove", "code" : code},
+                    data    : {"op" : "remove", "prod_id" : id},
                     success : function(response){
                             window.alert(response);
                             draw_cart();
