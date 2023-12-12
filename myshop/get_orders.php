@@ -32,39 +32,54 @@ $response = curl_exec($curl);
 $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 curl_close($curl);
 if($httpcode != 200){
-    echo "An error occured while retrieving your order history. Try again later.";
+    exit("An error occured while retrieving your order history. Try again later.");
+}
+$result = json_decode($response, true);
+if(count($result) <= 0){
+    echo "You haven't any orders.";
 }else{
-    $result = json_decode($response, true);
-
     echo "<table>";
     echo "<tr>";
+    echo    "<th>Order ID</th>";
     echo    "<th>Products</th>";
     echo    "<th>Status</th>";
     echo    "<th>Total price</th>";
     echo "</tr>"; 
     foreach ($result as $order) {
+        echo "<tr>";
         $order_id = $order["_id"]["\$oid"];
         $total_price = $order["TOTAL_PRICE"];
         $status = $order["STATUS"];
         $products = $order["PRODUCTS"];
+
+        echo "<td>".$order_id."</td>";
+        echo "<td>";
+        echo "<table>";
+        echo "<tr>";
+        echo    "<th class=\"invisible_border\">Name</th>";
+        echo    "<th class=\"invisible_border\">Quantity</th>";
+        echo    "<th class=\"invisible_border\">Product ID</th>";
+        echo "</tr>";
+        //echo "<td> prod info </td>";
         foreach($products as $product){
             $name = $product["name"];
             $quantity = $product["amount"];
             $id = $product["PRODUCT_ID"];
-            // echo $name;
+            echo "<tr>";
+            echo "<td class=\"invisible_border\">".$name."</td>";
+            echo "<td class=\"invisible_border\">".$quantity."</td>";
+            echo "<td class=\"invisible_border\">".$id."</td>";
+            echo "</tr>";
+            //echo $name;
             // echo $id;
             // echo $quantity;
-            echo "<tr>";
-                echo "<td>".$name."</td>";
-                echo "<td>".$id."</td>";
-                echo "<td>".$quantity."</td>";
-            echo "</tr>";
         }
+        echo "</table>";
+        echo "</td>";
+        echo "<td>".$status."</td>";
+        echo "<td>".$total_price."</td>";
+        echo "</tr>";
     }
     echo "</table>";
-    //print_r($result);
-    
-    
-    
 }
 ?>

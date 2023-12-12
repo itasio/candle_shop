@@ -28,6 +28,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
             <div class = "navbar">
                 <button class="dropdownButton"> Menu</button>
                 <div class="dropdown-content">
+                    <a href="my_orders.php">My orders</a>
                     <a href="products.php">Products</a>
                     <a href="cart.php">Cart</a>
                     <a href="seller.php">Seller (only for sellers)</a>
