@@ -20,7 +20,7 @@ else{
     echo    "<th>Name</th>";
     echo    "<th>Price</th>";
     echo    "<th>Category</th>";
-    echo   "<th>Sellername</th>";
+    echo    "<th>Sellername</th>";
     echo    "<th>Cart insertion date</th>";
     echo    "<th>Quantity</th>";
     echo    "<th>Action</th>";
