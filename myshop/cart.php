@@ -12,7 +12,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1"s>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset = "UTF-8">
     <link rel="stylesheet" href="styles_main_site.css">
     <link rel="icon" href="favicon.png" />
@@ -47,13 +47,17 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
             <div id="data_table">
                     <div id= "table1"> </div>
             </div>
-            
+            <button data-role= "kafka" onclick="kafkaFunc()">click me</button>
         </div>
         
 
     </div>
 
     <script>
+
+        function kafkaFunc() {
+            window.location = "kafka_producer.php";
+        }
         var frm = document.getElementById("table1");
         var sc =  document.getElementById("sum_container");
 
@@ -120,6 +124,8 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                 });
             })
 
+
+            
         })
     </script>
 </body>
