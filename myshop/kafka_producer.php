@@ -1,29 +1,38 @@
 <?php
 $conf = new RdKafka\Conf();
-$conf->set('metadata.broker.list', 'kafka:8097');
+$conf->set('metadata.broker.list', 'kafka:19092'); 
+// I am inside docker so i use the internal listener as suggested
+//@ https://www.confluent.io/blog/kafka-listeners-explained/
 
 
 $producer = new RdKafka\Producer($conf);
 
 $topic = $producer->newTopic("test2");
-echo $topic->getName();
-echo "hi1";
-for ($i = 0; $i < 10; $i++) {
-    $topic->produce(RD_KAFKA_PARTITION_UA, 0, "Message $i");
+echo "Topic name is: ".$topic->getName()."\n";
+echo "<br>";
+//for ($i = 0; $i < 10; $i++) {
+    $topic->produce(RD_KAFKA_PARTITION_UA, 0, "hi there");
     $producer->poll(0);
-}
-echo "hi2";
-for ($flushRetries = 0; $flushRetries < 10; $flushRetries++) {
-    $result = $producer->flush(10000);
+//}
+//for ($flushRetries = 0; $flushRetries < 10; $flushRetries++) {
+    $result = $producer->flush(30000);
+    //  echo $result." flushretries ".$flushRetries;
+    echo $result;
+    echo "<br>";
     if (RD_KAFKA_RESP_ERR_NO_ERROR === $result) {
-        break;
-    }
-}
-echo "hi3";
+        // break;
+        echo "SUCCESS";
 
-if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
-    throw new \RuntimeException('Was unable to flush, messages might be lost!');
-}
+    }elseif (RD_KAFKA_RESP_ERR__TIMED_OUT === $result) {
+        echo "TIMEOUT (-185)";
+    }else{
+        throw new \RuntimeException('Was unable to flush, messages might be lost!');
+    }
+//}
+
+// if (RD_KAFKA_RESP_ERR_NO_ERROR !== $result) {
+//     throw new \RuntimeException('Was unable to flush, messages might be lost!');
+// }
 
 
 
