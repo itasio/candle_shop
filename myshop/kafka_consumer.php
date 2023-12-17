@@ -8,7 +8,7 @@ $conf = new RdKafka\Conf();
 $conf->set('group.id', 'myConsumerGroup');
 
 // Initial list of Kafka brokers
-$conf->set('metadata.broker.list', 'kafka:8097');
+$conf->set('metadata.broker.list', 'kafka:19092');
 
 // Set where to start consuming messages when there is no initial offset in
 // offset store or the desired offset is out of range.
