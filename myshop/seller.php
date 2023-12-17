@@ -136,13 +136,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
                     $msg =  "An unexpected error occured. Please try again later.". "Error: " . "<br>" . curl_error($curl);
                 else
                     $msg = 'You have successfully added a new product.';
-
             }
         }
     }
 } 
 
-function validInput($name, $prod_code, $prod_price, $prod_category, $quantity){
+
+function validInput($name, $prod_code, $prod_price, $prod_category, $quantity): bool{
     if(empty(trim($name)) || empty(trim($prod_code)) ||empty(trim($prod_price)) || empty(trim($prod_category)) || empty(trim($quantity)))
         return false;
     return true;

@@ -16,10 +16,10 @@ $client = $database->connect();
 $order = new Order($client);
 
 $data = json_decode(file_get_contents("php://input"));
-
-if($order->create($data)){
+$result = $order->create($data);
+if($result){
     header("HTTP/1.0 201 Created");
-    echo json_encode(array('msg'=>'You have successfully created a new order.'));
+    echo json_encode($result);
 }else{
     echo json_encode(array('msg'=>'There was an error in order placement. Try again.'));
 }

@@ -45,9 +45,9 @@ class Order{
 
     /**
      * Creates a document in the Orders collection.
-     * Returns true if the document was added successfully or false on failure.
      * 
-     * @return boolean
+     * 
+     * @return id of the created placed order, false otherwise
      */
     public function create($data){
         try {
@@ -58,7 +58,7 @@ class Order{
                     'STATUS'          => "PENDING",
                     'PRODUCTS'        => $data->products
                 ]);
-                return $insertOneResult->isAcknowledged();
+                return $insertOneResult->getInsertedId();
             }else{
                 return false;
             }

@@ -8,6 +8,8 @@ $conf = new RdKafka\Conf();
 $conf->set('group.id', 'myConsumerGroup');
 
 // Initial list of Kafka brokers
+// I am inside docker so i use the internal listener as suggested
+//@ https://www.confluent.io/blog/kafka-listeners-explained/
 $conf->set('metadata.broker.list', 'kafka:19092');
 
 // Set where to start consuming messages when there is no initial offset in
