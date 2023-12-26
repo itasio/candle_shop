@@ -1,6 +1,9 @@
 {
     "require": {
         "mongodb/mongodb": "^1.16",
-        "vlucas/phpdotenv": "^5.5"
+        "vlucas/phpdotenv": "^5.5",
+        "amphp/amp": "^3.0",
+        "react/promise": "^3.0.0",
+        "revolt/event-loop": "^1.0"
     }
 }
