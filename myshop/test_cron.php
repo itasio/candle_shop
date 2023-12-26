@@ -12,7 +12,7 @@
  * 4. cron job consumes msg, call to Orders API, update status
  */
 
-/*
+
 
 $quantity_remain = array();
 $quantity_req =  1;
