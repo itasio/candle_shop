@@ -23,7 +23,7 @@ $data = json_decode(file_get_contents("php://input"));
 
 $filter = [];
 
-if(isset($data->pid)){
+if(isset($data->pid)){  //product id single or multiple
     $documentIds = array();
     foreach ($data->pid as $id) {
         $documentId = new ObjectId($id);

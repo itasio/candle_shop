@@ -57,15 +57,22 @@ if($httpcode != 200){
 $result = json_decode($response, true);
 if(count($result) == 0){
     echo "Products unavailable";
-    //STATUS REJECTED
+    //STATUS REJECTED and exit
+    if(!update_order_status($order_id, "REJECT")){
+        echo "An error occured while updating order status";
+    }
+    exit("Order Rejected ".$order_id);
 }else{
     echo "Products available\n";
-    //STATUS ACCEPTED
     foreach($result as $product){
         $quantity_avail = $product["QUANTITY"];
         $p_name = $product["NAME"];
         if($quantity_req > $quantity_avail){
-            //STATUS REJECTED
+            //STATUS REJECTED and exit
+            if(!update_order_status($order_id, "REJECT")){
+                echo "An error occured while updating order status";
+            }
+            exit("Order Rejected".$order_id);
         }else{
             echo "quantity avail: ".$quantity_avail."\n";
             echo "name: ".$p_name."\n";
@@ -77,6 +84,50 @@ if(count($result) == 0){
          * consider the order REJECTED
          */
     }
+    //here every product in the order is accepted
+    //request to API to 1.update db and 2. push msg to kafka
+
+    for($i = 0; $i < count($product_id); $i++){
+
+        $curl = curl_init();
+
+        curl_setopt_array($curl, array(
+        CURLOPT_URL => 'http://php-apache-environment:80/api/products/update.php',
+        CURLOPT_RETURNTRANSFER => true,
+        CURLOPT_ENCODING => '',
+        CURLOPT_MAXREDIRS => 10,
+        CURLOPT_TIMEOUT => 0,
+        CURLOPT_FOLLOWLOCATION => true,
+        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+        CURLOPT_CUSTOMREQUEST => 'PATCH',
+        CURLOPT_POSTFIELDS =>'{
+            "pID":"'.$product_id[$i].'",
+            "quantity":'.$quantity_remain[$i].'
+        }',
+        CURLOPT_HTTPHEADER => array(
+            'Content-Type: application/json'
+        ),
+        ));
+
+        $response = curl_exec($curl);
+        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        curl_close($curl);
+        if($httpcode != 200){
+            echo "An error occured in updating product quantities\n";
+            echo "product id: ".$product_id[$i]."\n";
+            echo "quantity remain: ".$quantity_remain[$i]."\n";
+            exit();
+        }
+    }
+
+    //update orders db about an order status
+    if(!update_order_status($order_id, "SUCCESS")){
+        echo "An error occured while updating order status";
+    }
+    exit("Order Accepted ".$order_id);
 }
 
+function update_order_status($order_id, $new_status): bool{
+    return true;
+}
 ?>
