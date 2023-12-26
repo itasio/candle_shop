@@ -58,7 +58,19 @@ class Order{
                     'STATUS'          => "PENDING",
                     'PRODUCTS'        => $data->products
                 ]);
-                return $insertOneResult->getInsertedId();
+                $order_id =  $insertOneResult->getInsertedId();
+                
+                // $order_id = $result["\$oid"];
+                if($order_id !== null){
+                    //inserted successfully in db
+                    //push msg to kafka
+                    if($this->send_Kafka_msg($order_id->__toString(), $data)){
+                        //echo "Sent to Kafka successfully";
+                    }else{
+                        //echo "Problem in sending to Kafka";
+                    }
+                }
+                return $order_id;
             }else{
                 return false;
             }
@@ -66,6 +78,36 @@ class Order{
             echo $e->getMessage();
             return false;
         }
+    }
+
+    /**
+     * Produce messages to kafka. Returns true if success, false otherwise
+     * 
+     * @return boolean
+     */
+    function send_Kafka_msg($order_id, $order_info){
+        require_once dirname(__DIR__) . '/kafka_connect.php';
+
+
+        $producer = new RdKafka\Producer($conf);
+
+        $topic = $producer->newTopic("testtt");
+
+        $msg = new stdClass();
+        $msg->id = $order_id;
+        $msg->products = $order_info->products;
+
+        $payload = json_encode($msg);
+        $topic->produce(RD_KAFKA_PARTITION_UA, 0, $payload);
+        $producer->poll(0);
+        for ($flushRetries = 0; $flushRetries < 3; $flushRetries++) {
+            //try to flush up to 3 times
+            $status = $producer->flush(10000);
+            if (RD_KAFKA_RESP_ERR_NO_ERROR === $status)
+                return true;
+        }
+        if (RD_KAFKA_RESP_ERR_NO_ERROR !== $status)
+            return false;
     }
 }
 

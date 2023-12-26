@@ -1,4 +1,5 @@
 <?php
+use MongoDB\BSON\ObjectId;
 header('Access-Control-Allow-Origin: *');
 header('Content-Type: application/json');
 header('Access-Control-Allow-Methods: POST');
@@ -22,6 +23,14 @@ $data = json_decode(file_get_contents("php://input"));
 
 $filter = [];
 
+if(isset($data->pid)){
+    $documentIds = array();
+    foreach ($data->pid as $id) {
+        $documentId = new ObjectId($id);
+        $documentIds[] = $documentId;
+    }
+    $filter['_id'] = ['$in' => $documentIds];
+}
 if(isset($data->name)) $filter['NAME'] = $data->name;
 if(isset($data->prod_code)) $filter['PRODUCTCODE'] = $data->prod_code;
 if(isset($data->date)){ 

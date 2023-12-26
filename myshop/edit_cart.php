@@ -112,41 +112,13 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
             }else{
                 echo"Congrats your order was placed successfully.\nStatus: Pending\n\n";
                 $result = json_decode($response,true);
-                $order_id = $result["\$oid"];
                 //Also clear the cart
                 $_SESSION["cart"] = array();
                 $_SESSION["sum_of_cart"] = 0;
                 echo "Your cart is now empty. Head to My Orders to review your order.\n";
-                if(!send_Kafka_msg($order_id, $order_info)){
-                    echo "Your order has been placed in our database.\n
-                            An error occured at the order status monitoring system.
-                            \nPlease contact with the admin";
-                }
             }
         }
 }
 
-/**
- * Produce messages to kafka. Returns true if success, false otherwise
- * 
- * @return boolean
- */
-function send_Kafka_msg($order_id, $order_info){
-    require_once "kafka_connect.php";
-    $producer = new RdKafka\Producer($conf);
 
-    $topic = $producer->newTopic($order_id);
-    $msg =  $order_info->products;
-    $payload = json_encode($msg);
-    $topic->produce(RD_KAFKA_PARTITION_UA, 0, $payload);
-    $producer->poll(0);
-    for ($flushRetries = 0; $flushRetries < 3; $flushRetries++) {
-        //try to flush up to 3 times
-        $status = $producer->flush(10000);
-        if (RD_KAFKA_RESP_ERR_NO_ERROR === $status)
-            return true;
-    }
-    if (RD_KAFKA_RESP_ERR_NO_ERROR !== $status)
-        return false;
-}
 ?>

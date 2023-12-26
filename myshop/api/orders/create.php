@@ -23,5 +23,4 @@ if($result){
 }else{
     echo json_encode(array('msg'=>'There was an error in order placement. Try again.'));
 }
-
 ?>
