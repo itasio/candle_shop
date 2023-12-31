@@ -109,6 +109,40 @@ class Order{
         if (RD_KAFKA_RESP_ERR_NO_ERROR !== $status)
             return false;
     }
-}
 
+    /**
+     * Function that updates an order's status.
+     * Returns true if the document was modified successfully or false on failure.
+     * 
+     * @return boolean
+     */
+    public function update($data){
+        try {
+            if(isset($data->orderID) && isset($data->status)){ 
+                $filter = ['_id' => new MongoDB\BSON\ObjectID($data->orderID)];
+                $set_fields = [];
+                if($data->status == 'SUCCESS' || $data->status == 'REJECT')
+                    $set_fields['STATUS'] = $data->status;
+                else
+                    return false;
+            }else{
+                return false;
+            }
+            $update = ['$set' => $set_fields];
+            $options = ['upsert' => false];
+    
+            $updateResult = $this->collection->updateOne($filter, $update, $options);
+    
+            if ($updateResult->getMatchedCount() > 0)
+                return true;
+            else{
+                return false;
+                
+            }
+        } catch (\Exception $e) {
+            //echo $e->getMessage();
+            return false;
+        }
+    }
+}
 ?>

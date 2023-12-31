@@ -25,7 +25,7 @@ class Product{
     }
 
       /**
-     * Fuction that creates a document in the products collection.
+     * Function that creates a document in the products collection.
      * Returns true if the document was added successfully or false on failure.
      * 
      * @return boolean
@@ -51,7 +51,7 @@ class Product{
     }
 
     /**
-     * Fuction that updates a document in the products collection.
+     * Function that updates a document in the products collection.
      * Returns true if the document was modified successfully or false on failure.
      * 
      * @return boolean
@@ -94,7 +94,7 @@ class Product{
     }
 
      /**
-     * Fuction that sets field: date of withdrawal to current date of the matched document in the products collection.
+     * Function that sets field: date of withdrawal to current date of the matched document in the products collection.
      * Date is saved in string format
      * Returns true if the document was modified successfully or false on failure.
      * Caution: The document is not deleted from the db.

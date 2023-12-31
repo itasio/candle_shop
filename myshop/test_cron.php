@@ -8,12 +8,13 @@
  * The sequence is
  * 1. User places order
  * 2. Call to Orders API, push to kafka orders_topic
- * 3. cron job consumes msg, call to Products API, update quantity, push to kafka  products_topic
- * 4. cron job consumes msg, call to Orders API, update status
+ * 3. cron job consumes msg,
+ * 4. calls to Products API to check availability and update quantity,
+ * 5. calls to Orders API to update order status
  */
 
 
-
+/*
 $quantity_remain = array();
 $quantity_req =  1;
 $product_id =array();
@@ -84,10 +85,11 @@ if(count($result) == 0){
          * consider the order REJECTED
          */
     }
-    //here every product in the order is accepted
-    //request to API to 1.update db and 2. push msg to kafka
-
-    for($i = 0; $i < count($product_id); $i++){
+    /**here every product in the order is accepted 
+     * request to API to 1.update db and 2. push msg to kafka
+     */
+    /*
+     for($i = 0; $i < count($product_id); $i++){
 
         $curl = curl_init();
 
@@ -129,5 +131,36 @@ if(count($result) == 0){
 
 function update_order_status($order_id, $new_status): bool{
     return true;
+
+    $curl = curl_init();
+
+    curl_setopt_array($curl, array(
+    CURLOPT_URL => 'http://php-apache-environment:80/api/orders/update.php',
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => '',
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'POST',
+    CURLOPT_POSTFIELDS =>'{
+        "orderID":"'.$order_id.'",
+        "status":"'.$new_status.'"
+    }',
+    CURLOPT_HTTPHEADER => array(
+        'Content-Type: application/json'
+    ),
+    ));
+
+    $response = curl_exec($curl);
+    $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    curl_close($curl);
+    if($httpcode != 200){
+        echo("An error occured while updating order's status. ". curl_error($curl)." \nFor orderId: ".$order_id." \nHTTP response code: ".$httpcode);
+        return false;
+    }else{
+        echo("Order status updated successfully");
+        return true;
+    }
 }
 ?>
