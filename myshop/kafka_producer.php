@@ -9,9 +9,11 @@ $producer = new RdKafka\Producer($conf);
 
 $topic = $producer->newTopic("test2");
 echo "Topic name is: ".$topic->getName()."\n";
-echo "<br>";
+
 //for ($i = 0; $i < 10; $i++) {
-    $topic->produce(RD_KAFKA_PARTITION_UA, 0, "you there");
+    $var = rand(1, 20);
+    echo $var."\n";
+    $topic->produce(RD_KAFKA_PARTITION_UA, 0, "hi: ".$var);
     $producer->poll(0);
 //}
 //for ($flushRetries = 0; $flushRetries < 10; $flushRetries++) {

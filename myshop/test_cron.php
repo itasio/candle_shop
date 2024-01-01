@@ -14,16 +14,71 @@
  */
 
 
-/*
-$quantity_remain = array();
-$quantity_req =  1;
-$product_id =array();
-$product_id[] = '65567a231155ad8c9675f2ed'; 
-$product_id[] = '65567a931155ad8c9675f2ef'; 
+
+/**
+ * Consume messages form orders topic
+ *//*
+require_once "kafka_connect.php";
+// Configure the group.id. All consumer with the same group.id will consume
+// different partitions.
+$conf->set('group.id', 'myConsumerGroup');
+
+// Set where to start consuming messages when there is no initial offset in
+// offset store or the desired offset is out of range.
+// 'earliest': start from the beginning
+$conf->set('auto.offset.reset', 'earliest');
+
+// Emit EOF event when reaching the end of a partition
+$conf->set('enable.partition.eof', 'true');
+
+$consumer = new RdKafka\KafkaConsumer($conf);
+
+// Subscribe to topic 'test'
+$consumer->subscribe(['testtt']);
+
+//read up to 40 messages i.e. 40 orders max per cron job
+// for ($i=0; $i < 40; $i++) { 
+    $message = $consumer->consume(1000);
+    switch ($message->err) {
+        case RD_KAFKA_RESP_ERR_NO_ERROR:
+            $order = json_decode($message->payload);
+            $order_id = $order->id;
+            echo "New order with id: ".$order_id."\n";
+            
+            foreach($order->products as $product){
+                $product_id =array();           //product ids of each order
+                $quantity_req =array();         //array with prod_id => quantity_requested
+                $quantity_remain = array();     //array with prod_id => quantity_remain
+
+                $amount = $product->amount;
+                $prod_id = $product->PRODUCT_ID;
+                $product_id[] = $prod_id;
+                $quantity_req[$prod_id] = $amount;
+            }
+            break;
+        case RD_KAFKA_RESP_ERR__PARTITION_EOF:
+            echo "No more messages; will wait for more\n";
+            break;
+        case RD_KAFKA_RESP_ERR__TIMED_OUT:
+            echo "Timed out\n";
+            break;
+        default:
+            throw new \Exception($message->errstr(), $message->err);
+            break;
+    }
+// }
 
 
-// $product_id = '65567a231155ad8c9675f2ed';
-//call to Products API to read a product info
+
+
+// $product_id[] = '65567a231155ad8c9675f2ed'; 
+// $product_id[] = '65567a931155ad8c9675f2ef'; 
+
+// $quantity_req['65567a231155ad8c9675f2ed'] =  1;
+// $quantity_req['65567a931155ad8c9675f2ef'] =  2;
+
+
+//call to Products API to read order's products info
 
 $posted_array = json_encode(['pid' => $product_id]);
 
@@ -66,9 +121,10 @@ if(count($result) == 0){
 }else{
     echo "Products available\n";
     foreach($result as $product){
+        $id = $key["_id"]["\$oid"];
         $quantity_avail = $product["QUANTITY"];
         $p_name = $product["NAME"];
-        if($quantity_req > $quantity_avail){
+        if($quantity_req[$id] > $quantity_avail){
             //STATUS REJECTED and exit
             if(!update_order_status($order_id, "REJECT")){
                 echo "An error occured while updating order status";
@@ -77,19 +133,21 @@ if(count($result) == 0){
         }else{
             echo "quantity avail: ".$quantity_avail."\n";
             echo "name: ".$p_name."\n";
-            $quantity_remain[] = $quantity_avail - $quantity_req;
+            $quantity_remain[$id] = $quantity_avail - $quantity_req[$id];
         }
-        /**if every item of the order is available
-         * update products db for all items in the order
-         * even if one item has not enough quantity,
-         * consider the order REJECTED
-         */
+        // if every item of the order is available
+        // update products db for all items in the order
+        // even if one item has not enough quantity,
+        // consider the order REJECTED
+         
     }
-    /**here every product in the order is accepted 
-     * request to API to 1.update db and 2. push msg to kafka
-     */
-    /*
-     for($i = 0; $i < count($product_id); $i++){
+    //here every product in the order is accepted 
+    // request to API to 
+    //1. update quantities in products db
+    // 2. update order status
+     
+    
+     foreach($product_id as $product){
 
         $curl = curl_init();
 
@@ -103,8 +161,8 @@ if(count($result) == 0){
         CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
         CURLOPT_CUSTOMREQUEST => 'PATCH',
         CURLOPT_POSTFIELDS =>'{
-            "pID":"'.$product_id[$i].'",
-            "quantity":'.$quantity_remain[$i].'
+            "pID":"'.$product.'",
+            "quantity":'.$quantity_remain[$product].'
         }',
         CURLOPT_HTTPHEADER => array(
             'Content-Type: application/json'
@@ -116,8 +174,8 @@ if(count($result) == 0){
         curl_close($curl);
         if($httpcode != 200){
             echo "An error occured in updating product quantities\n";
-            echo "product id: ".$product_id[$i]."\n";
-            echo "quantity remain: ".$quantity_remain[$i]."\n";
+            echo "product id: ".$product."\n";
+            echo "quantity remain: ".$quantity_remain[$product]."\n";
             exit();
         }
     }
