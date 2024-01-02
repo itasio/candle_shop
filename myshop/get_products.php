@@ -91,7 +91,7 @@ if(count($result) == 0){
         echo "<td data-target=\"CATEGORY\">" . $category . "</td>";
         echo "<td data-target=\"SELLERNAME\">" . $sellername . "</td>";
         echo "<td data-target=\"QUANTITY\">" . $quantity . "</td>";
-        if($dateofwithdrawal == ''){
+        if($dateofwithdrawal == '' && $quantity > 0){
           echo "<td data-target=\"DATEOFWITHDRAWAL\"> available </td>";
           echo "<td>" ."<button data-role= \"add\" data-id= ". $id." \"> Add to cart </button> </td>";
         }else{

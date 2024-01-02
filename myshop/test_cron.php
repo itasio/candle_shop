@@ -13,31 +13,25 @@
  * 5. calls to Orders API to update order status
  */
 
-
+$MaxOrdersProcessed = 20; //read up to 20 messages i.e. 20 orders max per cron job
 
 /**
  * Consume messages form orders topic
- *//*
+ */
 require_once "kafka_connect.php";
-// Configure the group.id. All consumer with the same group.id will consume
-// different partitions.
+
 $conf->set('group.id', 'myConsumerGroup');
 
-// Set where to start consuming messages when there is no initial offset in
-// offset store or the desired offset is out of range.
-// 'earliest': start from the beginning
 $conf->set('auto.offset.reset', 'earliest');
 
-// Emit EOF event when reaching the end of a partition
 $conf->set('enable.partition.eof', 'true');
 
 $consumer = new RdKafka\KafkaConsumer($conf);
 
-// Subscribe to topic 'test'
 $consumer->subscribe(['testtt']);
 
-//read up to 40 messages i.e. 40 orders max per cron job
-// for ($i=0; $i < 40; $i++) { 
+
+for ($i=0; $i < $MaxOrdersProcessed; $i++) { 
     $message = $consumer->consume(1000);
     switch ($message->err) {
         case RD_KAFKA_RESP_ERR_NO_ERROR:
@@ -57,139 +51,135 @@ $consumer->subscribe(['testtt']);
             }
             break;
         case RD_KAFKA_RESP_ERR__PARTITION_EOF:
-            echo "No more messages; will wait for more\n";
+            echo "No more messages, will wait for more\n";
+            exit("No more messages\n");
             break;
         case RD_KAFKA_RESP_ERR__TIMED_OUT:
             echo "Timed out\n";
+            exit("Timed out\n");
             break;
         default:
             throw new \Exception($message->errstr(), $message->err);
             break;
     }
-// }
 
 
 
 
-// $product_id[] = '65567a231155ad8c9675f2ed'; 
-// $product_id[] = '65567a931155ad8c9675f2ef'; 
+    //call to Products API to read order's products info
 
-// $quantity_req['65567a231155ad8c9675f2ed'] =  1;
-// $quantity_req['65567a931155ad8c9675f2ef'] =  2;
+    $posted_array = json_encode(['pid' => $product_id]);
 
+    $curl = curl_init();
 
-//call to Products API to read order's products info
-
-$posted_array = json_encode(['pid' => $product_id]);
-
-$curl = curl_init();
-
-curl_setopt_array($curl, array(
-  CURLOPT_URL => 'http://php-apache-environment:80/api/products/read.php',
-  CURLOPT_RETURNTRANSFER => true,
-  CURLOPT_ENCODING => '',
-  CURLOPT_MAXREDIRS => 10,
-  CURLOPT_TIMEOUT => 0,
-  CURLOPT_FOLLOWLOCATION => true,
-  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-  CURLOPT_CUSTOMREQUEST => 'POST',
-  CURLOPT_POSTFIELDS => $posted_array,
-  CURLOPT_HTTPHEADER => array(
-    'Content-Type: application/json'
-  ),
-));
+    curl_setopt_array($curl, array(
+    CURLOPT_URL => 'http://php-apache-environment:80/api/products/read.php',
+    CURLOPT_RETURNTRANSFER => true,
+    CURLOPT_ENCODING => '',
+    CURLOPT_MAXREDIRS => 10,
+    CURLOPT_TIMEOUT => 0,
+    CURLOPT_FOLLOWLOCATION => true,
+    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+    CURLOPT_CUSTOMREQUEST => 'POST',
+    CURLOPT_POSTFIELDS => $posted_array,
+    CURLOPT_HTTPHEADER => array(
+        'Content-Type: application/json'
+    ),
+    ));
 
 
 
-$response = curl_exec($curl);
-$httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+    $response = curl_exec($curl);
+    $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
-curl_close($curl);
-if($httpcode != 200){
-    exit("An error occured while requesting products info.". curl_error($curl));
-    //STATUS remains PENDING
-}
-
-$result = json_decode($response, true);
-if(count($result) == 0){
-    echo "Products unavailable";
-    //STATUS REJECTED and exit
-    if(!update_order_status($order_id, "REJECT")){
-        echo "An error occured while updating order status";
+    curl_close($curl);
+    if($httpcode != 200){
+        exit("An error occured while requesting products info.". curl_error($curl)."\n");
+        //STATUS remains PENDING
     }
-    exit("Order Rejected ".$order_id);
-}else{
-    echo "Products available\n";
-    foreach($result as $product){
-        $id = $key["_id"]["\$oid"];
-        $quantity_avail = $product["QUANTITY"];
-        $p_name = $product["NAME"];
-        if($quantity_req[$id] > $quantity_avail){
-            //STATUS REJECTED and exit
-            if(!update_order_status($order_id, "REJECT")){
-                echo "An error occured while updating order status";
+
+    $result = json_decode($response, true);
+    if(count($result) == 0){
+        echo "Products unavailable";
+        //STATUS REJECTED and exit
+        if(!update_order_status($order_id, "REJECT")){
+            echo "An error occured while updating order status\n";
+        }
+        exit("Order Rejected ".$order_id."\n");
+    }else{
+        // There are products available. Will check if they are enough for this order
+        foreach($result as $product){
+            $id = $product["_id"]["\$oid"];
+            $quantity_avail = $product["QUANTITY"];
+            $p_name = $product["NAME"];
+            if($quantity_req[$id] > $quantity_avail){
+                //STATUS REJECTED and exit
+                echo "Requested ".$quantity_req[$id]." ".$p_name."\n";
+                echo "Available ".$quantity_avail." ".$p_name."\n";
+                if(!update_order_status($order_id, "REJECT")){
+                    echo "An error occured while updating order status\n";
+                }
+                exit("Order Rejected ".$order_id."\n");
+            }else{
+                echo "quantity avail: ".$quantity_avail."\n";
+                echo "name: ".$p_name."\n";
+                $quantity_remain[$id] = $quantity_avail - $quantity_req[$id];
             }
-            exit("Order Rejected".$order_id);
-        }else{
-            echo "quantity avail: ".$quantity_avail."\n";
-            echo "name: ".$p_name."\n";
-            $quantity_remain[$id] = $quantity_avail - $quantity_req[$id];
+            // if every item of the order is available
+            // update products db for all items in the order
+            // even if one item has not enough quantity,
+            // consider the order REJECTED
+            
         }
-        // if every item of the order is available
-        // update products db for all items in the order
-        // even if one item has not enough quantity,
-        // consider the order REJECTED
-         
-    }
-    //here every product in the order is accepted 
-    // request to API to 
-    //1. update quantities in products db
-    // 2. update order status
-     
-    
-     foreach($product_id as $product){
+        //here every product in the order is accepted 
+        // request to API to 
+        //1. update quantities in products db
+        // 2. update order status
+        
+        
+        foreach($product_id as $product){
 
-        $curl = curl_init();
+            $curl = curl_init();
 
-        curl_setopt_array($curl, array(
-        CURLOPT_URL => 'http://php-apache-environment:80/api/products/update.php',
-        CURLOPT_RETURNTRANSFER => true,
-        CURLOPT_ENCODING => '',
-        CURLOPT_MAXREDIRS => 10,
-        CURLOPT_TIMEOUT => 0,
-        CURLOPT_FOLLOWLOCATION => true,
-        CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
-        CURLOPT_CUSTOMREQUEST => 'PATCH',
-        CURLOPT_POSTFIELDS =>'{
-            "pID":"'.$product.'",
-            "quantity":'.$quantity_remain[$product].'
-        }',
-        CURLOPT_HTTPHEADER => array(
-            'Content-Type: application/json'
-        ),
-        ));
+            curl_setopt_array($curl, array(
+            CURLOPT_URL => 'http://php-apache-environment:80/api/products/update.php',
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_ENCODING => '',
+            CURLOPT_MAXREDIRS => 10,
+            CURLOPT_TIMEOUT => 0,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_CUSTOMREQUEST => 'PATCH',
+            CURLOPT_POSTFIELDS =>'{
+                "pID":"'.$product.'",
+                "quantity":'.$quantity_remain[$product].'
+            }',
+            CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+            ),
+            ));
 
-        $response = curl_exec($curl);
-        $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        curl_close($curl);
-        if($httpcode != 200){
-            echo "An error occured in updating product quantities\n";
-            echo "product id: ".$product."\n";
-            echo "quantity remain: ".$quantity_remain[$product]."\n";
-            exit();
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+            if($httpcode != 200){
+                echo "An error occured in updating product quantities\n";
+                echo "product id: ".$product."\n";
+                echo "quantity remain: ".$quantity_remain[$product]."\n";
+                exit();
+            }
         }
+
+        //update orders db about an order status
+        if(!update_order_status($order_id, "SUCCESS")){
+            echo "An error occured while updating order status\n";
+        }
+        exit("Order Accepted ".$order_id."\n");
     }
 
-    //update orders db about an order status
-    if(!update_order_status($order_id, "SUCCESS")){
-        echo "An error occured while updating order status";
-    }
-    exit("Order Accepted ".$order_id);
-}
+}   //end for
 
 function update_order_status($order_id, $new_status): bool{
-    return true;
-
     $curl = curl_init();
 
     curl_setopt_array($curl, array(
@@ -214,10 +204,10 @@ function update_order_status($order_id, $new_status): bool{
     $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
     curl_close($curl);
     if($httpcode != 200){
-        echo("An error occured while updating order's status. ". curl_error($curl)." \nFor orderId: ".$order_id." \nHTTP response code: ".$httpcode);
+        echo("An error occured while updating order's status. ". curl_error($curl)." \nFor orderId: ".$order_id." \nHTTP response code: ".$httpcode."\n");
         return false;
     }else{
-        echo("Order status updated successfully");
+        echo("Order status updated successfully\n");
         return true;
     }
 }
