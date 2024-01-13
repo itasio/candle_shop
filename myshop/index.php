@@ -72,10 +72,6 @@ if($_SERVER["REQUEST_METHOD"] == "POST"){
           CURLOPT_POSTFIELDS =>'grant_type=password&username='.$email.'&password='.$password.'',
           CURLOPT_HTTPHEADER => array(
             'Content-Type: application/x-www-form-urlencoded',            
-            // Desk
-            //'Authorization: Basic NmQ0Mzc5YWQtNzI1YS00MGI5LWI5MWYtZjJkNWRkZjQ4YWNlOjFhZjIwZDg3LTI1ODAtNDNhNy05MTA0LTcwZjIyMGRmNDYyYg==' // this huge string is the base-64(client_id:client_secret) string
-            //Lap
-            //'Authorization: Basic NDA3NWE2YzUtNTUxYi00NTllLWJiMTctZDZjMGFjZDkwNWM0OmU1OTU2MGFmLTE4NTgtNDBhZi04ZDVlLTcxNDAxNDZjODkyZQ=='
             'Authorization: Basic YTZmZDBlMzctZjY3My00YTE2LWI0YjMtMjEzZDZkNzM0YjkxOjJlNzg4YjZmLTQzM2QtNGU1NC04ZGQyLTAwMmY4Y2ZiZmRkYQ=='
           
           ),

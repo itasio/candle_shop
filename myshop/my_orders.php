@@ -22,27 +22,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
 
 <body onload="draw_orders()">
     <div class="bg">
-        <div class = "container">
-            <div class = "navbar">
-                <button class="dropdownButton"> Menu</button>
-                <div class="dropdown-content">
-                    <a href="my_orders.php">My orders</a>
-                    <a href="products.php">Products</a>
-                    <a href="cart.php">Cart</a>
-                    <a href="seller.php">Seller (only for sellers)</a>
-                    <a href="administration.php">Admin (only for admins)</a>
-                </div>
-                <input type="text" placeholder="Search.." class="searchbar">
-                <div class="usr">
-                    <?php echo htmlspecialchars($_SESSION["name"]). " " .htmlspecialchars($_SESSION["surname"]). " (".htmlspecialchars($_SESSION["role"]). ")" ; ?>
-                </div>
-                <a href="logout.php">Sign Out of Your Account</a>
-                
-            </div>
-
-
-        </div>
-        
+        <?php include_once "menu.php";?>
         <div class="contentTable">
             <h2>Order history</h1>
             <hr>

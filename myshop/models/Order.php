@@ -91,7 +91,7 @@ class Order{
 
         $producer = new RdKafka\Producer($conf);
 
-        $topic = $producer->newTopic("testtt");
+        $topic = $producer->newTopic("myOrders");
 
         $msg = new stdClass();
         $msg->id = $order_id;

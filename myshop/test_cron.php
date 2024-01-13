@@ -28,7 +28,7 @@ $conf->set('enable.partition.eof', 'true');
 
 $consumer = new RdKafka\KafkaConsumer($conf);
 
-$consumer->subscribe(['testtt']);
+$consumer->subscribe(['myOrders']);
 
 
 for ($i=0; $i < $MaxOrdersProcessed; $i++) { 
