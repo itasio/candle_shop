@@ -12,48 +12,31 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta name="viewport" content="width=device-width, initial-scale=1"s>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta charset = "UTF-8">
     <link rel="stylesheet" href="styles_main_site.css">
+    <link rel="icon" href="favicon.png" />
     <title> Cart</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 </head>
 
 <body onload="draw_cart()">
     <div class="bg">
-        <div class = "container">
-            <div class = "navbar">
-                <button class="dropdownButton"> Menu</button>
-                <div class="dropdown-content">
-                    <a href="products.php">Products</a>
-                    <a href="cart.php">Cart</a>
-                    <a href="seller.php">Seller (only for sellers)</a>
-                    <a href="administration.php">Admin (only for adminis)</a>
-                </div>
-                <input type="text" placeholder="Search.." class="searchbar">
-                <div class="usr">
-                    <?php echo htmlspecialchars($_SESSION["name"]). " " .htmlspecialchars($_SESSION["surname"]). " (".htmlspecialchars($_SESSION["role"]). ")" ; ?>
-                </div>
-                <a href="logout.php">Sign Out of Your Account</a>
-                
-            </div>
-
-
-        </div>
-
+        <?php include_once "menu.php";?>
         <div class="contentTable">
             <div id="data_table">
                     <div id= "table1"> </div>
             </div>
-            
         </div>
         
 
     </div>
 
     <script>
+
         var frm = document.getElementById("table1");
         var sc =  document.getElementById("sum_container");
+
         function draw_cart(){
             frm.innerHTML = "";
             xhttp = new XMLHttpRequest();
@@ -71,11 +54,11 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
  
             //remove from cart choice made
             $(document).on('click', 'button[data-role=remove]', function(){
-                var code = $(this).data('id');
+                var id = $(this).data('id');
                 $.ajax({
                     url     : "edit_cart.php",
                     method  : "POST",
-                    data    : {"op" : "remove", "code" : code},
+                    data    : {"op" : "remove", "prod_id" : id},
                     success : function(response){
                             window.alert(response);
                             draw_cart();
@@ -86,6 +69,39 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                 });
             })
 
+                //remove from cart choice made
+            $(document).on('click', 'button[data-role=clear]', function(){
+                $.ajax({
+                    url     : "edit_cart.php",
+                    method  : "POST",
+                    data    : {"op" : "clear"},
+                    success : function(response){
+                            window.alert(response);
+                            draw_cart();
+                    },
+                    error   : function(xhr){
+                        window.alert("An error occured: " + xhr.status + " " + xhr.statusText);
+                    }
+                });
+            })
+
+            $(document).on('click', 'button[data-role=place_order]', function(){
+                $.ajax({
+                    url     : "edit_cart.php",
+                    method  : "POST",
+                    data    : {"op" : "order"},
+                    success : function(response){
+                            window.alert(response);
+                            draw_cart();
+                    },
+                    error   : function(xhr){
+                        window.alert("An error occured: " + xhr.status + " " + xhr.statusText);
+                    }
+                });
+            })
+
+
+            
         })
     </script>
 </body>

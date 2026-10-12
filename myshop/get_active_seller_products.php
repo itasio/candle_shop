@@ -11,57 +11,72 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
     exit;
 }
 
- // Include config file for db connectivity
- require_once "config.php";
+$username = $_SESSION["username"];
 
- //query to run
- $sql =" SELECT ID, NAME, PRODUCTCODE, PRICE, CATEGORY 
- FROM products WHERE SELLERNAME = ? AND DATEOFWITHDRAWAL IS NULL" ;
+$curl = curl_init();
 
- if($stmt = $conn->prepare($sql)){
-    // Bind variables to the prepared statement as parameters
-    $stmt->bind_param("s", $_SESSION["username"]);      
-    // Attempt to execute the prepared statement
-    if($stmt->execute()){
-        // Store result
-        $result = $stmt->get_result();
-        if($result->num_rows == 0){
-            //nothing to display
-            $errorMessage = "You have not any products currently available in our site. You can a
-                                add one from our menu.";
-        }else{
-            echo "<table>";
-            echo "<tr>";
-                echo "<th>name</th>";
-                echo "<th>product code</th>";
-                echo "<th>price</th>";
-                echo "<th>category</th>";
-                echo "<th>edit</th>";
-                echo "<th>delete</th>";
-            echo "</tr>";
+curl_setopt_array($curl, array(
+  CURLOPT_URL => 'http://php-apache-environment:80/api/products/read.php',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'POST',
+  CURLOPT_POSTFIELDS =>'{
+    "sellers":"'.$username.'",
+    "status":"active"
+}',
+  CURLOPT_HTTPHEADER => array(
+    'Content-Type: application/json'
+  ),
+));
 
-            
-            while ($row = $result->fetch_assoc()) {
-                echo "<tr id= ". $row['ID']. ">";
+$response = curl_exec($curl);
+$httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+curl_close($curl);
+if($httpcode != 200){
+    exit("An error occured while requesting products info.". curl_error($curl));
+}
 
-                    echo "<td data-target=\"NAME\">" . $row['NAME'] . "</td>";
-                    echo "<td data-target=\"PRODUCTCODE\">" . $row['PRODUCTCODE'] . "</td>";
-                    echo "<td data-target=\"PRICE\">" . $row['PRICE'] . "</td>";
-                    echo "<td data-target=\"CATEGORY\">" . $row['CATEGORY'] . "</td>";
-                    echo "<td>" ."<button data-role= \"edit\" data-id= ". $row['ID']." \"> Edit </button> </td>";
-                    echo "<td>" ."<button data-role= \"delete\" data-id= ". $row['ID']." \"> Delete </button> </td>";
-                echo "</tr>";
-            }
-            echo "</table>";
-        }
-        
+$result = json_decode($response, true);
 
-    }else{
-        $errorMessage = "Oops! Something went wrong. Please try again later.";
+if(count($result) == 0){
+    echo  "You don't have any products currently available in our site.<br>You can a
+    add one from our menu.";
+}else{
+    echo "<table>";
+    echo "<tr>";
+        echo "<th>name</th>";
+        echo "<th>product code</th>";
+        echo "<th>price</th>";
+        echo "<th>category</th>";
+        echo "<th>quantity</th>";
+        echo "<th>edit</th>";
+        echo "<th>delete</th>";
+    echo "</tr>";
 
+    foreach($result as $key){
+        $name = $key["NAME"];
+        $productcode = $key["PRODUCTCODE"];
+        $price = $key["PRICE"];
+        $category = $key["CATEGORY"];
+        $dateofwithdrawal = $key["DATEOFWITHDRAWAL"];
+        $quantity = $key["QUANTITY"];
+        $sellername = $key["SELLERNAME"];
+        $id = $key["_id"]["\$oid"];
+  
+        echo "<tr id= ". $id. ">";
+            echo "<td data-target=\"NAME\">" . $name . "</td>";
+            echo "<td data-target=\"PRODUCTCODE\">" . $productcode . "</td>";
+            echo "<td data-target=\"PRICE\">" . $price . "</td>";
+            echo "<td data-target=\"CATEGORY\">" . $category . "</td>";
+            echo "<td data-target=\"QUANTITY\">" . $quantity . "</td>";
+            echo "<td>" ."<button data-role= \"edit\" data-id= ". $id." \"> Edit </button> </td>";
+            echo "<td>" ."<button data-role= \"delete\" data-id= ". $id." \"> Delete </button> </td>";
+        echo "</tr>";
     }
-    // Close statement
-    $stmt->close();
- }
-
+    echo "</table>";
+}
 ?>

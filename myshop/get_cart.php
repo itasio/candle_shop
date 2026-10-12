@@ -16,11 +16,11 @@ else{
     echo "<h2>These are your cart info</h2>";
     echo "<table>";
     echo "<tr>";
-    echo    "<th>Code</th>";
+    echo    "<th>Product id</th>";
     echo    "<th>Name</th>";
     echo    "<th>Price</th>";
     echo    "<th>Category</th>";
-    echo   "<th>Sellername</th>";
+    echo    "<th>Sellername</th>";
     echo    "<th>Cart insertion date</th>";
     echo    "<th>Quantity</th>";
     echo    "<th>Action</th>";
@@ -42,6 +42,13 @@ else{
     echo "<div id = \"sum_container\">";
     echo "<b style=\"color: black;\">".$_SESSION["sum_of_cart"]."</b>";
     echo "</div>";
+    echo "<div id = \"clear_cart\">";
+    echo "<button data-role= \"clear\" \"> Clear cart </button>";
+    echo "</div>";
+    echo "<div id = \"place_order\">";
+    echo "<button data-role= \"place_order\" \"> Place your order </button>";
+    echo "</div>";
+
 
 }
 ?>

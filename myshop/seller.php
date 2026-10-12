@@ -16,10 +16,7 @@ $msg="";
 if($_SERVER["REQUEST_METHOD"] == "POST") {
     
 
-    // Include config file for db connectivity
-    require_once "config.php";
-
-    if(isset($_POST["name"]) && isset($_POST["prod_code"]) && isset($_POST["prod_price"]) && isset($_POST["prod_category"]))
+    if(isset($_POST["name"]) && isset($_POST["prod_code"]) && isset($_POST["prod_price"]) && isset($_POST["prod_category"]) && isset($_POST["quantity"]))
     {
 
         $name = $_POST["name"];
@@ -27,60 +24,126 @@ if($_SERVER["REQUEST_METHOD"] == "POST") {
         $prod_price = $_POST["prod_price"];
         $prod_category = $_POST["prod_category"];
         $username = $_SESSION["username"];
-        if(!validInput($name, $prod_code, $prod_price, $prod_category)){
+        $quantity = $_POST["quantity"];
+        if(!validInput($name, $prod_code, $prod_price, $prod_category, $quantity)){
             $msg =  'You cannot submit blank fields';
-        }
-       
-       
-       else{
+        }else{
 
             //check if user tries to insert a product that has been deleted in the past
             // if so make date of withdrawal null and update info, otherwise make insertion
-            $sql = "SELECT * FROM products where PRODUCTCODE = '$prod_code' and CATEGORY = '$prod_category' and DATEOFWITHDRAWAL IS NOT NULL";
-            $result = $conn->query($sql);
-            if ($result->num_rows == 1) {
-                //update 
-                $sql ="UPDATE products SET DATEOFWITHDRAWAL = NULL, NAME = '$name', PRICE = '$prod_price' WHERE PRODUCTCODE = '$prod_code' and CATEGORY = '$prod_category'";
-                $result = $conn->query($sql);
-                if($result){
-                        
-                    $msg = 'The deleted product is available again with updated info';
-    
-                } else{
-                    $msg =  "An unexpected error occured. Please try again later.". "Error: " . "<br>" . $conn->error;
-                }
-            }else{
+            $curl = curl_init();
 
-                $sql = "INSERT INTO products(NAME, PRODUCTCODE, PRICE, SELLERNAME, CATEGORY) 
-                VALUES ('$name', '$prod_code', '$prod_price', '$username','$prod_category')";
-                
-
-                try {
-                    $result = $conn->query($sql);
-                    
-                    if($result){
-                        
-                        $msg = 'You have successfully added a new product.';
-        
-                    } else{
-                        $msg =  "An unexpected error occured. Please try again later." . "<br>" . "Important notice: Products with the same code can't belong in the same category.";
-                    }
-                } catch (\Throwable $th) {
-                    $msg =  "An unexpected error occured. You cannot insert the same product twice.";
-                }
+            curl_setopt_array($curl, array(
+              CURLOPT_URL => 'http://php-apache-environment:80/api/products/read.php',
+              CURLOPT_RETURNTRANSFER => true,
+              CURLOPT_ENCODING => '',
+              CURLOPT_MAXREDIRS => 10,
+              CURLOPT_TIMEOUT => 0,
+              CURLOPT_FOLLOWLOCATION => true,
+              CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+              CURLOPT_CUSTOMREQUEST => 'POST',
+              CURLOPT_POSTFIELDS =>'{
+                "sellers":"'.$username.'",
+                "status":"withdrawed",
+                "categories":"'.$prod_category.'",
+                "prod_code":"'.$prod_code.'"
+            }',
+              CURLOPT_HTTPHEADER => array(
+                'Content-Type: application/json'
+              ),
+            ));
             
+            $response = curl_exec($curl);
+            $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            curl_close($curl);
+
+            if($httpcode != 200){
+                $msg = "An unexpected error occured, please try again later.";
+            }
+
+            $result = json_decode($response, true);
+
+
+            if (count($result)== 1) {
+                //update
+                foreach($result as $key)
+                    $pid = $key["_id"]["\$oid"];
+                //$pid = $result["_id"]["\$oid"];
+
+                // $sql ="UPDATE products SET DATEOFWITHDRAWAL = NULL, NAME = '$name', PRICE = '$prod_price' WHERE PRODUCTCODE = '$prod_code' and CATEGORY = '$prod_category'";
+
+                $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                    CURLOPT_URL => 'http://php-apache-environment:80/api/products/update.php',
+                    CURLOPT_RETURNTRANSFER => true,
+                    CURLOPT_ENCODING => '',
+                    CURLOPT_MAXREDIRS => 10,
+                    CURLOPT_TIMEOUT => 0,
+                    CURLOPT_FOLLOWLOCATION => true,
+                    CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                    CURLOPT_CUSTOMREQUEST => 'PATCH',
+                    CURLOPT_POSTFIELDS =>'{
+                        "pID":"'.$pid.'",
+                        "name":"'.$name.'",
+                        "pr":'.$prod_price.',
+                        "quantity":'.$quantity.',
+                        "dateofwithdrawal":""
+                    }',
+                    CURLOPT_HTTPHEADER => array(
+                        'Content-Type: application/json'
+                    ),
+                ));
+
+                $response = curl_exec($curl);
+                $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                curl_close($curl);
+                if($httpcode != 200)
+                    $msg =  "An unexpected error occured. Please try again later.". "Error: " . "<br>" . curl_error($curl);
+                else
+                    $msg = 'The deleted product is available again with updated info';
+            }else{
+                //insert
+                $curl = curl_init();
+
+                curl_setopt_array($curl, array(
+                CURLOPT_URL => 'http://php-apache-environment:80/api/products/create.php',
+                CURLOPT_RETURNTRANSFER => true,
+                CURLOPT_ENCODING => '',
+                CURLOPT_MAXREDIRS => 10,
+                CURLOPT_TIMEOUT => 0,
+                CURLOPT_FOLLOWLOCATION => true,
+                CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+                CURLOPT_CUSTOMREQUEST => 'POST',
+                CURLOPT_POSTFIELDS =>'{
+                    "name": "'.$name.'",
+                    "prod_code":"'.$prod_code.'",
+                    "prod_price":'.$prod_price.',
+                    "sellername":"'.$username.'",
+                    "quantity":'.$quantity.',
+                    "prod_category":"'.$prod_category.'"
+                }',
+                CURLOPT_HTTPHEADER => array(
+                    'Content-Type: application/json'
+                ),
+                ));
+
+                $response = curl_exec($curl);
+                $httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+                curl_close($curl);
+
+                if($httpcode != 201)
+                    $msg =  "An unexpected error occured. Please try again later.". "Error: " . "<br>" . curl_error($curl);
+                else
+                    $msg = 'You have successfully added a new product.';
             }
         }
     }
-
-
-
- $conn->close();
-
 } 
 
-function validInput($name, $prod_code, $prod_price, $prod_category){
-    if(empty(trim($name)) || empty(trim($prod_code)) ||empty(trim($prod_price)) || empty(trim($prod_category)))
+
+function validInput($name, $prod_code, $prod_price, $prod_category, $quantity): bool{
+    if(empty(trim($name)) || empty(trim($prod_code)) ||empty(trim($prod_price)) || empty(trim($prod_category)) || empty(trim($quantity)))
         return false;
     return true;
 }
@@ -93,32 +156,14 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
     <meta name="viewport" content="width=device-width, initial-scale=1"s>
     <meta charset = "UTF-8">
     <link rel="stylesheet" href="styles_main_site.css">
+    <link rel="icon" href="favicon.png" />
     <title> Seller page</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 </head>
 
 <body>
     <div class="bg">
-        <div class = "container">
-            <div class = "navbar">
-                <button class="dropdownButton"> Menu</button>
-                <div class="dropdown-content">
-                    <a href="products.php">Products</a>
-                    <a href="cart.php">Cart</a>
-                    <a href="seller.php">Seller (only for sellers)</a>
-                    <a href="administration.php">Admin (only for admins)</a>
-                </div>
-                <input type="text" placeholder="Search.." class="searchbar">
-                <div class="usr">
-                    <?php echo htmlspecialchars($_SESSION["name"]). " " .htmlspecialchars($_SESSION["surname"]). " (".htmlspecialchars($_SESSION["role"]). ")" ; ?>
-                </div>
-                <a href="logout.php">Sign Out of Your Account</a>
-                
-            </div>
-
-
-        </div>
-
+        <?php include_once "menu.php";?>
         <div class="contentTable">
             <h2>From this page you can access and modify your products</h2>
 
@@ -150,6 +195,9 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
 
                     <label for="product_category"><b>Product category</b></label>
                     <input id="product_category" type="text" name="product_category" required class = "inputFields"> <br>
+
+                    <label for="quantity"><b>Quantity</b></label>
+                    <input id="quantity" type="number" name="quantity" required class = "inputFields" min="1">  <br>
 
                     <input id="pID" type ="hidden" class = "inputFields">
 
@@ -257,11 +305,30 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                 form.appendChild(label_name);
                 form.appendChild(br.cloneNode());
 
-                //input for product code
+                //input for product category
                 var inp = document.createElement("input");
                 inp.setAttribute("type", "text");
                 inp.setAttribute("name", "prod_category");
                 inp.setAttribute("id", "prod_category");
+                inp.required = true;
+                //append product code input to the form element
+                form.appendChild(inp);
+                form.appendChild(br.cloneNode());
+
+                //label for quantity
+                var label_name = document.createElement("label");
+                label_name.setAttribute("for","quantity");
+                label_name.innerHTML = "Quantity";
+                //append label to the form element
+                form.appendChild(label_name);
+                form.appendChild(br.cloneNode());
+
+                //input for quantity
+                var inp = document.createElement("input");
+                inp.setAttribute("type", "number");
+                inp.setAttribute("name", "quantity");
+                inp.setAttribute("id", "quantity");
+                inp.setAttribute("min", "1");
                 inp.required = true;
                 //append product code input to the form element
                 form.appendChild(inp);
@@ -355,12 +422,14 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                 var pcode = $('#'+id).children('td[data-target=PRODUCTCODE]').text();
                 var pr = $('#'+id).children('td[data-target=PRICE]').text();
                 var cat = $('#'+id).children('td[data-target=CATEGORY]').text();
+                var quantity = $('#'+id).children('td[data-target=QUANTITY]').text();
 
                 //append values of table into input fields
                 $('#product_name').val(name);
                 $('#product_code').val(pcode);
                 $('#product_price').val(pr);
                 $('#product_category').val(cat);
+                $('#quantity').val(quantity);
                 $('#pID').val(id);
 
             })
@@ -374,12 +443,13 @@ function validInput($name, $prod_code, $prod_price, $prod_category){
                 var pcode = $('#product_code').val();
                 var pr = $('#product_price').val();
                 var cat =  $('#product_category').val();
+                var quantity =  $('#quantity').val();
                 var pID =  $('#pID').val();
                 document.getElementById("edit_form").style.display = "none";
                 $.ajax({
                     url     : "edit_product.php",
                     method  : "POST",
-                    data    : {name : name, pcode : pcode, pr : pr, cat : cat, pID : pID},
+                    data    : {name : name, pcode : pcode, pr : pr, cat : cat, quantity : quantity, pID : pID},
                     success : function(response){
                               //now reloading the data from the database
                               loadActiveProducts(frm);

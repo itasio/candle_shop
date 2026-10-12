@@ -11,29 +11,28 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
     exit;
 }
 
-// Include config file for db connectivity
-require_once "config.php";
+$user_id = $_POST["identity"];
 
-//query to run
-//check if he deletes himself
-$id = $_POST["identity"];
-$sql = "SELECT USERNAME FROM users where ID = '$id'";
-$result = $conn->query($sql);
+/*******************Delete a user ************/
+$ch = curl_init();
 
-if($result->fetch_assoc()['USERNAME'] == $_SESSION["username"]){
-    //admin tries to delete himself
-        echo "You can not delete yourself! Other admins have the privilege to do it. ";
+curl_setopt($ch, CURLOPT_URL, "http://keyrock:3000/v1/users/".$user_id."");
+//curl_setopt($ch, CURLOPT_RETURNTRANSFER, TRUE);
+curl_setopt($ch, CURLOPT_HEADER, FALSE);
+
+curl_setopt($ch, CURLOPT_CUSTOMREQUEST, "DELETE");
+
+curl_setopt($ch, CURLOPT_HTTPHEADER, array(
+    "X-Auth-token: ".$_SESSION["x_subj"].""
+));
+
+$response = curl_exec($ch);
+$httpcode = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+
+curl_close($ch);
+if($httpcode != 204){
+    exit("An error occured while deleting the user");
 }else{
-    //admin does not delete himself
-    $sql ="DELETE FROM users WHERE ID = '$id'";
-    $result = $conn->query($sql);
-    if($result){
-        echo "User has been deleted successfully!";
-    }else{
-        echo "An unexpected error occured. Please try again later.". "Error: " . "<br>" . $conn->error;
-    }
-
+    echo "User deleted successfully.";
 }
- $conn->close();
-
 ?>

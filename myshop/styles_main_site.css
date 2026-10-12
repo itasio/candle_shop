@@ -123,6 +123,10 @@ table,th,td {
     padding: 5px;
   }
 
+  .invisible_border {
+    border: none;
+  }
+
     #table1{
         margin: auto;   /*center it*/
         width: 60%;     /*cover 50 % of its container*/

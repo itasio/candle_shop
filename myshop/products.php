@@ -15,32 +15,14 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
     <meta name="viewport" content="width=device-width, initial-scale=1"s>
     <meta charset = "UTF-8">
     <link rel="stylesheet" href="styles_main_site.css">
+    <link rel="icon" href="favicon.png" />
     <title> Products page</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 </head>
 
 <body onload="getProducts()">
     <div class="bg">
-        <div class = "container">
-            <div class = "navbar">
-                <button class="dropdownButton"> Menu</button>
-                <div class="dropdown-content">
-                    <a href="products.php">Products</a>
-                    <a href="cart.php">Cart</a>
-                    <a href="seller.php">Seller (only for sellers)</a>
-                    <a href="administration.php">Admin (only for adminis)</a>
-                </div>
-                <input type="text" placeholder="Search..." class="searchbar">
-                <div class="usr">
-                    <?php echo htmlspecialchars($_SESSION["name"]). " " .htmlspecialchars($_SESSION["surname"]). " (".htmlspecialchars($_SESSION["role"]). ")" ; ?>
-                </div>
-                <a href="logout.php">Sign Out of Your Account</a>
-                
-            </div>
-
-
-        </div>
-
+        <?php include_once "menu.php";?>
         <div class="contentTable">
             <div class="data_table_form">
                     <div class= "table_form"> </div>
@@ -187,7 +169,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
         //return a dropdown list of product categories to choose from in order to search based
         //on category
         function getCategoriesList(field){
-            var param = "CATEGORY";
+            var param = "category";
             xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
@@ -201,7 +183,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
         //return a dropdown list of sellers to choose from in order to search based
         //on productseller
         function getSellersList(field) {
-            var param = "PRODUCTSELLER";
+            var param = "productseller";
             xhttp = new XMLHttpRequest();
             xhttp.onreadystatechange = function() {
                 if (this.readyState == 4 && this.status == 200) {
@@ -214,7 +196,6 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
         }
 
         function getProducts() {
-            var param = 'criterion=all';
             console.log(frm);
             frm.innerHTML="";
             xhttp = new XMLHttpRequest();
@@ -225,7 +206,7 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                     frm.innerHTML = this.responseText;
                 }
             };
-            xhttp.send(param);
+            xhttp.send();
         }
 
         $(document).ready(function(){
@@ -240,7 +221,8 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                 var price = $('#'+id).children('td[data-target=PRICE]').text();
                 var dt = new Date();
                 var dt_str = dt.toDateString();
-                var product = { "name": name,
+                var product = { "prod_id" : id,
+                                "name": name,
                                 "code": code,
                                 "category": category,
                                 "sellername": sellername,

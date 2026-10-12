@@ -11,37 +11,45 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
     exit;
 }
 
- // Include config file for db connectivity
- require_once "config.php";
+$msg = "Oops! Something went wrong. Please try again later.";
 
- //query to run
- //not deleting, just inserting withdrawal date
- //product will be still on our database
- $sql ="UPDATE products SET NAME = ?, PRODUCTCODE = ?, PRICE = ?, CATEGORY = ? WHERE ID = ?";
- 
+$name = $_POST["name"] ?? exit($msg);
+$pcode = $_POST["pcode"] ?? exit($msg);
+$pr = $_POST["pr"] ?? exit($msg);
+$cat = $_POST["cat"] ?? exit($msg);
+$pID = $_POST["pID"] ?? exit($msg);
+$quantity  = $_POST["quantity"] ?? exit($msg);
 
+$curl = curl_init();
 
-$name = $_POST["name"];
-$pcode = $_POST["pcode"];
-$pr = $_POST["pr"];
-$cat = $_POST["cat"];
-$pID = $_POST["pID"];
+curl_setopt_array($curl, array(
+  CURLOPT_URL => 'http://php-apache-environment:80/api/products/update.php',
+  CURLOPT_RETURNTRANSFER => true,
+  CURLOPT_ENCODING => '',
+  CURLOPT_MAXREDIRS => 10,
+  CURLOPT_TIMEOUT => 0,
+  CURLOPT_FOLLOWLOCATION => true,
+  CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+  CURLOPT_CUSTOMREQUEST => 'PATCH',
+  CURLOPT_POSTFIELDS =>'{
+    "pID":"'.$pID.'",
+    "name":"'.$name.'",
+    "pr":'.$pr.',
+    "quantity":'.$quantity.',
+    "pcode":"'.$pcode.'",
+    "cat":"'.$cat.'"
+}',
+  CURLOPT_HTTPHEADER => array(
+    'Content-Type: application/json'
+  ),
+));
 
- if($stmt = $conn->prepare($sql)){
-    // Bind variables to the prepared statement as parameters
-    $stmt->bind_param("ssdsi",$name, $pcode, $pr, $cat, $pID);      
-    // Attempt to execute the prepared statement
-    if($stmt->execute()){
-        //delete success
-        echo "Your product has been updated successfully!"; 
-        
-
-    }else{
-        echo "Oops! Something went wrong. Please try again later.";
-
-    }
-    // Close statement
-    $stmt->close();
- }
-
+$response = curl_exec($curl);
+$httpcode = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+curl_close($curl);
+if($httpcode != 200){
+    echo $msg;
+}
+else
+    echo "Your product has been updated successfully!";
 ?>

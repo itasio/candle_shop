@@ -18,32 +18,14 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
     <meta name="viewport" content="width=device-width, initial-scale=1"s>
     <meta charset = "UTF-8">
     <link rel="stylesheet" href="styles_main_site.css">
+    <link rel="icon" href="favicon.png" />
     <title> Administration page</title>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.1/jquery.min.js"></script>
 </head>
 
 <body onload="getUsers()">
     <div class="bg">
-        <div class = "container">
-            <div class = "navbar">
-                <button class="dropdownButton"> Menu</button>
-                <div class="dropdown-content">
-                    <a href="products.php">Products</a>
-                    <a href="cart.php">Cart</a>
-                    <a href="seller.php">Seller (only for sellers)</a>
-                    <a href="administration.php">Admin (only for admins)</a>
-                </div>
-                <input type="text" placeholder="Search.." class="searchbar">
-                <div class="usr">
-                    <?php echo htmlspecialchars($_SESSION["name"]). " " .htmlspecialchars($_SESSION["surname"]). " (".htmlspecialchars($_SESSION["role"]). ")" ; ?>
-                </div>
-                <a href="logout.php">Sign Out of Your Account</a>
-                
-            </div>
-
-
-        </div>
-
+        <?php include_once "menu.php";?>
         <div class="contentTable">
             <!-- <h2>From this page you can access and modify users info</h2> -->
             <div class="data_table_form">
@@ -72,11 +54,11 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
                     <label for="pSeller"> <b>Product seller</b> </label>
                     <input type="radio" data-info="role" name="role" id="pSeller" value="PRODUCTSELLER" required> <br>
                     
-                    <label for="admin"> <b>Administrator</b> </label>
-                    <input type="radio" data-info="role" name="role" id="admin" value="ADMIN" required> <br>
+                    <!-- <label for="admin"> <b>Administrator</b> </label>
+                    <input type="radio" data-info="role" name="role" id="admin" value="ADMIN" required> <br> -->
 
-                    <label for="confirmed"> <b>Confirmed</b> </label>
-                    <input type="checkbox" name="confirmed" id="confirmed"> <br>
+                    <!-- <label for="confirmed"> <b>Confirmed</b> </label>
+                    <input type="checkbox" name="confirmed" id="confirmed"> <br> -->
 
 
                     <input id="uID" type ="hidden" class = "inputFields">
@@ -157,18 +139,18 @@ if(!isset($_SESSION["loggedinToMyShop"]) || $_SESSION["loggedinToMyShop"] !== tr
             var username = $('#user_name').val();
             var email =  $('#email').val();
             var role =  $("input[name='role']:checked").val();
-            if ($('#confirmed').is(":checked")){
-                var confirmed = "1";
-            }else{
-                var confirmed = "0";
-            }            
+            // if ($('#confirmed').is(":checked")){
+            //     var confirmed = "1";
+            // }else{
+            //     var confirmed = "0";
+            // }            
             var uID =  $('#uID').val();
             document.getElementById("editForm").style.display = "none";
             $.ajax({
                 url     : "edit_user.php",
                 method  : "POST",
                 data    : {name : name, surname : surname, username : username,
-                    email : email, role : role, confirmed : confirmed, uID : uID},
+                    email : email, role : role, uID : uID},
                 success : function(response){
                         //now reloading the data from the database
                         getUsers();

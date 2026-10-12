@@ -1,34 +1,141 @@
-version: '3.8'
+version: '3.5'
 services:
     php-apache-environment:
-        container_name: php-apache
+        container_name: php-apache-2
         build:
             context: ./
             dockerfile: Dockerfile
         depends_on:
-            - db
+            - mysql-db
         volumes:
             - ./myshop:/var/www/html/
         ports:
-            - 8000:80
-    db:
-        container_name: db
-        image: mysql
-        restart: always
-        environment:
-            MYSQL_ROOT_PASSWORD: MYSQL_ROOT_PASSWORD
-            MYSQL_DATABASE: shop1
-            MYSQL_USER: MYSQL_USER
-            MYSQL_PASSWORD: MYSQL_PASSWORD
-        ports:
-            - "9906:3306"
-
-    phpmyadmin:
-        image: phpmyadmin/phpmyadmin
-        ports:
-            - '8080:80'
-        restart: always
-        environment:
-            PMA_HOST: db
+            - 80:80
+    keyrock:
+        image: fiware/idm:7.6.0
+        container_name: fiware-keyrock
+        hostname: keyrock
+        networks:
+            default:
+                ipv4_address: 172.18.1.5
         depends_on:
-            - db
+            - mysql-db
+        ports:
+            - '3000:3000'
+            - '443:443'
+        environment:
+            - DEBUG=idm:*
+            - IDM_DB_HOST=mysql-db
+            - IDM_HOST=http://localhost:3000
+            - IDM_PORT=3000
+            # Development use only
+            # Use Docker Secrets for Sensitive Data
+            - IDM_DB_PASS=secret
+            - IDM_DB_USER=root
+            - IDM_ADMIN_USER=admin
+            - IDM_ADMIN_EMAIL=admin@test.com
+            - IDM_ADMIN_PASS=1234
+            - IDM_CORS_ENABLED=true
+            - IDM_CORS_ORIGIN= http://localhost:80/
+            - IDM_CORS_METHODS='GET', 'HEAD', 'PUT', 'PATCH', 'POST', 'DELETE'
+            - IDM_CORS_ALLOWED_HEADERS='*'
+            - IDM_CORS_EXPOSED_HEADERS= '*'
+            - IDM_CORS_PREFLIGHT= true
+
+
+
+    mysql-db:
+        restart: always
+        image: mysql:5.7
+        hostname: mysql-db
+        container_name: db-mysql
+        expose:
+            - '3306'
+        ports:
+            - '3306:3306'
+        networks:
+            default:
+                ipv4_address: 172.18.1.6
+        environment:
+            # Development use only
+            # Use Docker Secrets for Sensitive Data
+            - 'MYSQL_ROOT_PASSWORD=secret'
+            - 'MYSQL_ROOT_HOST=172.18.1.5'
+        volumes:
+            - mysql-db:/var/lib/mysql
+    
+    mongo:
+        image: mongo
+        #restart: always
+        ports:
+            - 27017:27017
+        networks:
+            default:
+                ipv4_address: 172.18.1.7
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: root
+            MONGO_INITDB_ROOT_PASSWORD: 1234
+        volumes:
+            - mongodata:/data/db
+
+    mongo-express:
+        image: mongo-express
+        #restart: unless-stopped
+        ports:  
+            - 8081:8081
+        depends_on:
+            - mongo
+        networks:
+            default:
+                ipv4_address: 172.18.1.8
+        environment:
+            ME_CONFIG_MONGODB_SERVER: mongo
+            ME_CONFIG_MONGODB_ADMINUSERNAME: root
+            ME_CONFIG_MONGODB_ADMINPASSWORD: 1234
+            ME_CONFIG_MONGODB_URL: mongo://root:1234@mongo:27017/
+
+    zookeeper:
+        image: confluentinc/cp-zookeeper:7.2.1
+        container_name: zookeeper
+        environment:
+            ZOOKEEPER_CLIENT_PORT: 2181
+        networks:
+            - default
+
+    kafka:
+        image: confluentinc/cp-kafka:7.2.1
+        container_name: kafka
+        ports:
+            - "8097:8097"
+        depends_on:
+            - zookeeper
+        environment:
+            KAFKA_BROKER_ID: 1
+            KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
+            KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: EXTERNAL:PLAINTEXT,INTERNAL:PLAINTEXT
+            KAFKA_ADVERTISED_LISTENERS: EXTERNAL://localhost:8097,INTERNAL://kafka:19092
+            KAFKA_INTER_BROKER_LISTENER_NAME: INTERNAL
+            KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+            KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+            KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+            KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+            KAFKA_JMX_PORT: 9101
+            KAFKA_JMX_HOSTNAME: localhost
+        networks:
+            - default
+        restart: on-failure
+        healthcheck:
+            test: ["CMD", "ping", "-c","1", "localhost:8097"]
+            interval: 30s
+            timeout: 10s
+            retries: 5
+
+networks:
+    default:
+        ipam:
+            config:
+                - subnet: 172.18.1.0/24
+volumes:
+    mysql-db: ~
+    mongo: ~
+    mongodata:
